@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { validateImagesWithoutAlt } from './rules/imageRules';
+import { RuleError } from './rules/types';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
 
@@ -36,11 +37,11 @@ export function deactivate() {
 	}
 }
 
-function isFileExtensionValid(document: vscode.TextDocument) {
+function isFileExtensionValid(document: vscode.TextDocument): boolean {
 	return document.languageId === 'html' || document.languageId === 'css';
 }
 
-function processValidation(document: vscode.TextDocument) {
+function processValidation(document: vscode.TextDocument): void {
 	const text = document.getText();
 	const errors = validateImagesWithoutAlt(text);
 

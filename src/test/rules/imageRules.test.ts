@@ -1,10 +1,16 @@
 import * as assert from 'assert';
 import { validateImagesWithoutAlt } from '../../rules/imageRules';
 
+interface ImageTestCase {
+    name: string;
+    html: string;
+    expected: number;
+}
+
 function runImageTests() {
     console.log("Iniciando Testes Unitarios: Regras de Acessibilidade de Imagem...");
 
-    const testCases = [
+    const testCases: ImageTestCase[] = [
         { name: "Atributo alt ausente", html: '<img src="teste.png">', expected: 1 },
         { name: "Atributo alt vazio", html: '<img src="teste.png" alt="">', expected: 1 },
         { name: "Alt valido", html: '<img src="teste.png" alt="Descricao">', expected: 0 },
