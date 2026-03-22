@@ -1,8 +1,4 @@
-export interface RuleError {
-  tag: string;
-  index: number;
-  message: string;
-}
+import { RuleError } from "./types";
 
 /**
  * Valida se as tags <img> possuem um atributo 'alt' não vazio.
