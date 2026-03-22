@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { validateImagesWithoutAlt } from './rules/imageRules';
+import { validateHeadersOrder } from './rules/headersRules';
 import { RuleError } from './rules/types';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
@@ -28,7 +29,19 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	const activeEditorChangeEvent = vscode.window.onDidChangeActiveTextEditor(editor => {
+		if (!editor) {
+			return;
+		}
+
+		const document = editor.document;
+		if (isFileExtensionValid(document)) {
+			processValidation(document);
+		}
+	});
+
 	context.subscriptions.push(documentChangeEvent);
+	context.subscriptions.push(activeEditorChangeEvent);
 }
 
 export function deactivate() {
@@ -43,7 +56,11 @@ function isFileExtensionValid(document: vscode.TextDocument): boolean {
 
 function processValidation(document: vscode.TextDocument): void {
 	const text = document.getText();
-	const errors = validateImagesWithoutAlt(text);
+
+	let errors: RuleError[] = [];
+
+	errors.push(...validateImagesWithoutAlt(text));
+	errors.push(...validateHeadersOrder(text));
 
 	errors.forEach(error => {
 		const startPosition = document.positionAt(error.index);
