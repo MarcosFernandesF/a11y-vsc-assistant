@@ -1,19 +1,29 @@
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
+let timeout: NodeJS.Timeout | undefined = undefined;
 
-	console.log('A11y Assistant Funcionado.');
+export function activate(context: vscode.ExtensionContext) {
+	console.log('A11y Assistant Funcionando.');
 
 	const documentChangeEvent = vscode.workspace.onDidChangeTextDocument(event => {
 		const document = event.document;
 
 		if (document.languageId === 'html' || document.languageId === 'css') {
-			console.log(event);
-			console.log("Evento escutado.");
+			if (timeout) {
+				clearTimeout(timeout);
+			}
+
+			timeout = setTimeout(() => {
+				console.log("Evento escutado: ", event);
+			}, 500);
 		}
 	});
 
 	context.subscriptions.push(documentChangeEvent);
 }
 
-export function deactivate() { }
+export function deactivate() {
+	if (timeout) {
+		clearTimeout(timeout);
+	}
+}

@@ -36,16 +36,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
+let timeout = undefined;
 function activate(context) {
-    console.log('A11y Assistant Funcionado.');
+    console.log('A11y Assistant Funcionando.');
     const documentChangeEvent = vscode.workspace.onDidChangeTextDocument(event => {
         const document = event.document;
         if (document.languageId === 'html' || document.languageId === 'css') {
-            console.log(event);
-            console.log("Evento escutado.");
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(() => {
+                console.log("Evento escutado: ", event);
+            }, 500);
         }
     });
     context.subscriptions.push(documentChangeEvent);
 }
-function deactivate() { }
+function deactivate() {
+    if (timeout) {
+        clearTimeout(timeout);
+    }
+}
 //# sourceMappingURL=extension.js.map
