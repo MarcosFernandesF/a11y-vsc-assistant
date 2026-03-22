@@ -2,7 +2,7 @@ import { RuleError } from "./types";
 
 /**
  * Valida se as tags <img> possuem um atributo 'alt' não vazio.
- * @param text O conteúdo HTML para análise
+ * @param text O conteúdo HTML a ser analisado.
  */
 export function validateImagesWithoutAlt(text: string): RuleError[] {
   const errors: RuleError[] = [];
