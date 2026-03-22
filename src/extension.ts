@@ -9,7 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
 	if (vscode.window.activeTextEditor) {
 		const doc = vscode.window.activeTextEditor.document;
 		if (isFileExtensionValid(doc)) {
-			validateImagesWithoutAlt(doc.getText());
+			processValidation(doc);
 		}
 	}
 
@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			timeout = setTimeout(() => {
-				validateImagesWithoutAlt(document.getText());
+				processValidation(document);
 			}, 500);
 		}
 	});
@@ -38,4 +38,14 @@ export function deactivate() {
 
 function isFileExtensionValid(document: vscode.TextDocument) {
 	return document.languageId === 'html' || document.languageId === 'css';
+}
+
+function processValidation(document: vscode.TextDocument) {
+	const text = document.getText();
+	const errors = validateImagesWithoutAlt(text);
+
+	errors.forEach(error => {
+		const startPosition = document.positionAt(error.index);
+		console.log(`[Linha ${startPosition.line + 1}] ${error.message}`);
+	});
 }
