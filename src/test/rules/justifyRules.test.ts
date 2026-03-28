@@ -2,32 +2,41 @@ import * as assert from 'assert';
 import { validateJustifiedCss } from '../../rules/justifyRules';
 import { TestCase } from '../../rules/types';
 
+type JustifyTestCase = TestCase<number> & {
+  category: 'Conforme' | 'Violacao' | 'Inaplicavel';
+};
+
 function runJustifyRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de Texto Justificado...');
 
-  const testCases: TestCase<number>[] = [
+  const testCases: JustifyTestCase[] = [
     {
       name: 'Sem text-align justify',
+      category: 'Conforme',
       html: 'p { text-align: left; }',
       expected: 0,
     },
     {
       name: 'Com text-align justify simples',
+      category: 'Violacao',
       html: '.content { text-align: justify; }',
       expected: 1,
     },
     {
       name: 'Com letras maiusculas e espacos',
+      category: 'Violacao',
       html: '.content { TEXT-ALIGN :   JUSTIFY; }',
       expected: 1,
     },
     {
       name: 'Dois usos de justify',
+      category: 'Violacao',
       html: '.a { text-align: justify; } .b { text-align: justify; }',
       expected: 2,
     },
     {
       name: 'Justify em comentario nao deve contar',
+      category: 'Inaplicavel',
       html: '/* text-align: justify; */ .a { text-align: left; }',
       expected: 0,
     },
@@ -37,12 +46,17 @@ function runJustifyRuleTests() {
 
   testCases.forEach(testCase => {
     const results = validateJustifiedCss(testCase.html);
+    const observed = results.length;
     try {
-      assert.strictEqual(results.length, testCase.expected);
-      console.log(`PASSOU: ${testCase.name}`);
+      assert.strictEqual(observed, testCase.expected);
+      console.log(
+        `OK | Categoria: ${testCase.category} | Caso: ${testCase.name} | esperado=${testCase.expected} encontrado=${observed}`
+      );
       passedCount++;
     } catch (err) {
-      console.error(`FALHOU: ${testCase.name}`);
+      console.error(
+        `ERRO | Categoria: ${testCase.category} | Caso: ${testCase.name} | esperado=${testCase.expected} encontrado=${observed}`
+      );
     }
   });
 
