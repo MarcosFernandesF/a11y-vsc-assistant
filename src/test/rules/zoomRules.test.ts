@@ -1,9 +1,8 @@
 import * as assert from 'assert';
 import { validateZoomCapability } from '../../rules/zoomRules';
-import { TestCase } from '../../rules/types';
+import { TestCase } from './testTypes';
 
 type ZoomTestCase = TestCase<number> & {
-  category: 'Conforme' | 'Violacao' | 'Inaplicavel';
   expectedMessageIncludes?: string[];
 };
 

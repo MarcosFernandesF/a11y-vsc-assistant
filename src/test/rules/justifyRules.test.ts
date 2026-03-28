@@ -1,41 +1,37 @@
 import * as assert from 'assert';
 import { validateJustifiedCss } from '../../rules/justifyRules';
-import { TestCase } from '../../rules/types';
-
-type JustifyTestCase = TestCase<number> & {
-  category: 'Conforme' | 'Violacao' | 'Inaplicavel';
-};
+import { TestCase } from './testTypes';
 
 function runJustifyRuleTests() {
-  console.log('Iniciando Testes Unitarios: Regra de Texto Justificado...');
+  console.log('Iniciando Testes Unitarios: Regra de Texto Justificado (CSS)...');
 
-  const testCases: JustifyTestCase[] = [
+  const testCases: TestCase<number>[] = [
     {
-      name: 'Sem text-align justify',
+      name: 'sem text-align justify',
       category: 'Conforme',
       html: 'p { text-align: left; }',
       expected: 0,
     },
     {
-      name: 'Com text-align justify simples',
+      name: 'com text-align justify simples',
       category: 'Violacao',
       html: '.content { text-align: justify; }',
       expected: 1,
     },
     {
-      name: 'Com letras maiusculas e espacos',
+      name: 'com letras maiusculas e espacos',
       category: 'Violacao',
       html: '.content { TEXT-ALIGN :   JUSTIFY; }',
       expected: 1,
     },
     {
-      name: 'Dois usos de justify',
+      name: 'dois usos de justify',
       category: 'Violacao',
       html: '.a { text-align: justify; } .b { text-align: justify; }',
       expected: 2,
     },
     {
-      name: 'Justify em comentario nao deve contar',
+      name: 'justify em comentario nao deve contar',
       category: 'Inaplicavel',
       html: '/* text-align: justify; */ .a { text-align: left; }',
       expected: 0,

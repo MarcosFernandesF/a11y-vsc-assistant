@@ -1,15 +1,11 @@
 import * as assert from 'assert';
 import { validateFocusVisualRemoval } from '../../rules/focusRules';
-import { TestCase } from '../../rules/types';
-
-type FocusTestCase = TestCase<number> & {
-  category: 'Conforme' | 'Violacao' | 'Inaplicavel';
-};
+import { TestCase } from './testTypes';
 
 function runFocusRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de Remocao de Foco Visual...');
 
-  const testCases: FocusTestCase[] = [
+  const testCases: TestCase<number>[] = [
     {
       name: 'outline none sem alternativa em focus',
       category: 'Violacao',

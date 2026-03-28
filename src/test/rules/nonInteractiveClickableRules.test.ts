@@ -1,15 +1,11 @@
 import * as assert from 'assert';
 import { validateNonInteractiveClickableElements } from '../../rules/nonInteractiveClickableRules';
-import { TestCase } from '../../rules/types';
-
-type NonInteractiveClickableTestCase = TestCase<number> & {
-  category: 'Conforme' | 'Violacao' | 'Inaplicavel';
-};
+import { TestCase } from './testTypes';
 
 function runNonInteractiveClickableTests() {
   console.log('Iniciando Testes Unitarios: Regra de Elementos Nao Interativos Clicaveis...');
 
-  const testCases: NonInteractiveClickableTestCase[] = [
+  const testCases: TestCase<number>[] = [
     {
       name: 'div com onclick sem role/tabindex',
       category: 'Violacao',
