@@ -1,31 +1,9 @@
 import { RuleError } from "./types";
+import { parseHtmlAttributes } from "./utils/htmlAttributes";
 
 // Localiza rapidamente cada tag <meta ...> no HTML para filtrar apenas
 // as meta viewport, sem depender de parser DOM no contexto da extensao.
 const META_TAG_REGEX = /<meta\b[^>]*>/gi;
-
-// Extrai atributos no formato nome=valor (com aspas duplas, simples ou
-// sem aspas), permitindo ler os atributos name/content da meta.
-const ATTRIBUTE_REGEX = /\b([\w:-]+)\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/gi;
-
-/**
- * Converte os atributos de uma tag em mapa chave/valor.
- */
-function parseAttributes(tag: string): Record<string, string> {
-  const attrs: Record<string, string> = {};
-  let attrMatch: RegExpExecArray | null;
-
-  // Regex global reutilizada precisa ser reiniciada a cada parse.
-  ATTRIBUTE_REGEX.lastIndex = 0;
-
-  while ((attrMatch = ATTRIBUTE_REGEX.exec(tag)) !== null) {
-    const name = attrMatch[1].toLowerCase();
-    const value = (attrMatch[3] ?? attrMatch[4] ?? attrMatch[5] ?? "").trim();
-    attrs[name] = value;
-  }
-
-  return attrs;
-}
 
 /**
  * Le o atributo content da viewport e extrai as diretivas declaradas.
@@ -83,7 +61,7 @@ export function validateZoomCapability(text: string): RuleError[] {
 
   while ((match = META_TAG_REGEX.exec(text)) !== null) {
     const entireTag = match[0];
-    const attrs = parseAttributes(entireTag);
+    const attrs = parseHtmlAttributes(entireTag);
     const name = attrs["name"]?.toLowerCase();
 
     if (name !== "viewport") {
