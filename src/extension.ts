@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { validateImagesWithoutAlt } from './rules/imageRules';
 import { validateHeadersOrder } from './rules/headersRules';
+import { validateZoomCapability } from './rules/zoomRules';
 import { RuleError } from './rules/types';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
@@ -61,6 +62,7 @@ function processValidation(document: vscode.TextDocument): void {
 
 	errors.push(...validateImagesWithoutAlt(text));
 	errors.push(...validateHeadersOrder(text));
+	errors.push(...validateZoomCapability(text));
 
 	errors.forEach(error => {
 		const startPosition = document.positionAt(error.index);
