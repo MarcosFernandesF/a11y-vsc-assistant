@@ -1,0 +1,13 @@
+button:focus {
+  outline: none;
+}
+
+.card:focus-visible {
+  outline: 0;
+}
+
+/* Caso conforme: remove outline, mas fornece alternativa visual */
+.link:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #005fcc;
+}
