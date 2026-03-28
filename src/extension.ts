@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { validateImagesWithoutAlt } from './rules/imageRules';
 import { validateHeadersOrder } from './rules/headersRules';
 import { validateZoomCapability } from './rules/zoomRules';
+import { validateJustifiedCss } from './rules/justifyRules';
 import { RuleError } from './rules/types';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
@@ -57,12 +58,19 @@ function isFileExtensionValid(document: vscode.TextDocument): boolean {
 
 function processValidation(document: vscode.TextDocument): void {
 	const text = document.getText();
+	const language = document.languageId;
 
 	let errors: RuleError[] = [];
 
-	errors.push(...validateImagesWithoutAlt(text));
-	errors.push(...validateHeadersOrder(text));
-	errors.push(...validateZoomCapability(text));
+	if (language === 'html') {
+		errors.push(...validateImagesWithoutAlt(text));
+		errors.push(...validateHeadersOrder(text));
+		errors.push(...validateZoomCapability(text));
+	}
+
+	if (language === 'css') {
+		errors.push(...validateJustifiedCss(text));
+	}
 
 	errors.forEach(error => {
 		const startPosition = document.positionAt(error.index);
