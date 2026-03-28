@@ -3,6 +3,7 @@ import { validateImagesWithoutAlt } from './rules/imageRules';
 import { validateHeadersOrder } from './rules/headersRules';
 import { validateZoomCapability } from './rules/zoomRules';
 import { validateJustifiedCss } from './rules/justifyRules';
+import { validateNonInteractiveClickableElements } from './rules/nonInteractiveClickableRules';
 import { RuleError } from './rules/types';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
@@ -66,6 +67,7 @@ function processValidation(document: vscode.TextDocument): void {
 		errors.push(...validateImagesWithoutAlt(text));
 		errors.push(...validateHeadersOrder(text));
 		errors.push(...validateZoomCapability(text));
+		errors.push(...validateNonInteractiveClickableElements(text));
 	}
 
 	if (language === 'css') {
