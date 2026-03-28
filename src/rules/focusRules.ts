@@ -63,7 +63,7 @@ export function validateFocusVisualRemoval(text: string): RuleError[] {
     let outlineMatch: RegExpExecArray | null;
     while ((outlineMatch = OUTLINE_REMOVAL_REGEX.exec(declarations)) !== null) {
       errors.push({
-        tag: `${selector} { ${outlineMatch[0]} }`,
+        tag: outlineMatch[0],
         index: declarationsStartIndex + outlineMatch.index,
         message: "Erro de Acessibilidade: Evite remover o foco visual (outline: none/0) sem indicador alternativo visivel.",
       });
