@@ -1,15 +1,11 @@
 import * as assert from 'assert';
 import { validateHtmlFocusVisible } from '../../rules/focusHtmlRules';
-import { TestCase } from '../../rules/types';
-
-type FocusHtmlTestCase = TestCase<number> & {
-  category: 'Conforme' | 'Violacao' | 'Inaplicavel';
-};
+import { TestCase } from './testTypes';
 
 function runFocusHtmlRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de Foco Visivel em HTML...');
 
-  const testCases: FocusHtmlTestCase[] = [
+  const testCases: TestCase<number>[] = [
     {
       name: 'link com href sem remocao de foco inline',
       category: 'Conforme',

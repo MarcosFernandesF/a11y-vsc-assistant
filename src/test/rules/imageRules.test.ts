@@ -1,15 +1,11 @@
 import * as assert from 'assert';
 import { validateImagesWithoutAlt } from '../../rules/imageRules';
-import { TestCase } from '../../rules/types';
-
-type ImageTestCase = TestCase<number> & {
-    category: 'Conforme' | 'Violacao' | 'Inaplicavel';
-};
+import { TestCase } from './testTypes';
 
 function runImageTests() {
     console.log("Iniciando Testes Unitarios: Regras de Acessibilidade de Imagem...");
 
-    const testCases: ImageTestCase[] = [
+    const testCases: TestCase<number>[] = [
         { name: "Atributo alt ausente", category: 'Violacao', html: '<img src="teste.png">', expected: 1 },
         { name: "Atributo alt vazio", category: 'Violacao', html: '<img src="teste.png" alt="">', expected: 1 },
         { name: "Alt valido", category: 'Conforme', html: '<img src="teste.png" alt="Descricao">', expected: 0 },

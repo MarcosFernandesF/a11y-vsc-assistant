@@ -1,15 +1,11 @@
 import * as assert from 'assert';
 import { validateHeadersOrder } from '../../rules/headersRules';
-import { TestCase } from '../../rules/types';
-
-type HeadersTestCase = TestCase<number> & {
-  category: 'Conforme' | 'Violacao' | 'Inaplicavel';
-};
+import { TestCase } from './testTypes';
 
 function runHeadersTests() {
   console.log('Iniciando Testes Unitarios: Regras de Hierarquia de Cabecalhos...');
 
-  const testCases: HeadersTestCase[] = [
+  const testCases: TestCase<number>[] = [
     { name: 'Apenas um cabecalho h1', category: 'Conforme', html: '<h1>Titulo</h1>', expected: 0 },
     { name: 'Apenas um cabecalho h4', category: 'Conforme', html: '<h4>Secao isolada</h4>', expected: 0 },
     { name: 'Apenas um cabecalho h6', category: 'Conforme', html: '<h6>Rodape isolado</h6>', expected: 0 },
