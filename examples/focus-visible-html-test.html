@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Teste de Foco Visivel em HTML</title>
+</head>
+
+<body>
+  <h1>Exemplo de foco visivel (HTML)</h1>
+
+  <!-- Violacao: elemento focavel com remocao de foco inline sem alternativa -->
+  <button style="outline: none;">Botao sem indicador de foco</button>
+
+  <!-- Conforme: elemento focavel com alternativa visual -->
+  <a href="/home" style="outline: none; box-shadow: 0 0 0 3px #005fcc;">Link com indicador alternativo</a>
+
+  <!-- Inaplicavel: fora da ordem sequencial -->
+  <a href="/contato" tabindex="-1" style="outline:none;">Link fora da navegacao sequencial</a>
+</body>
+
+</html>
