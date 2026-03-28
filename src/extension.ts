@@ -7,6 +7,7 @@ import { validateNonInteractiveClickableElements } from './rules/nonInteractiveC
 import { validateFocusVisualRemoval } from './rules/focusRules';
 import { validateHtmlFocusVisible } from './rules/focusHtmlRules';
 import { validatePageLanguage } from './rules/languageRules';
+import { validateDuplicateIds } from './rules/duplicateIdsRules';
 import { RuleError } from './rules/types';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
@@ -73,6 +74,7 @@ function processValidation(document: vscode.TextDocument): void {
 		errors.push(...validateNonInteractiveClickableElements(text));
 		errors.push(...validateHtmlFocusVisible(text));
 		errors.push(...validatePageLanguage(text));
+		errors.push(...validateDuplicateIds(text));
 	}
 
 	if (language === 'css') {
