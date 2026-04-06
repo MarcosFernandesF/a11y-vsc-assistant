@@ -1,5 +1,11 @@
 function buildEducationalMessage(problem: string, impact: string, fix: string): string {
-  return `Erro de Acessibilidade: ${problem} Impacto: ${impact} Como corrigir: ${fix}`;
+  return [
+    `Erro de Acessibilidade: ${problem}`,
+    "",
+    `Contexto: ${impact}`,
+    "",
+    `Como corrigir: ${fix}`,
+  ].join("\n");
 }
 
 export function duplicateIdMessage(id: string): string {
