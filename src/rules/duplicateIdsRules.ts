@@ -1,5 +1,6 @@
 import { RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
+import { duplicateIdMessage } from "./educationMessages";
 
 // Captura tags de abertura HTML para verificar repeticao de IDs no documento.
 const OPENING_TAG_REGEX = /<([a-z][\w:-]*)\b[^>]*>/gi;
@@ -28,7 +29,7 @@ export function validateDuplicateIds(text: string): RuleError[] {
       errors.push({
         tag: entireTag,
         index: match.index,
-        message: `Erro de Acessibilidade: ID duplicado detectado (id=\"${id}\"). IDs devem ser unicos na pagina.`,
+        message: duplicateIdMessage(id),
       });
       continue;
     }

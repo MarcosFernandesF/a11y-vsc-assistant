@@ -1,5 +1,6 @@
 import { RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
+import { zoomMaximumScaleMessage, zoomUserScalableMessage } from "./educationMessages";
 
 // Localiza rapidamente cada tag <meta ...> no HTML para filtrar apenas
 // as meta viewport, sem depender de parser DOM no contexto da extensao.
@@ -87,7 +88,7 @@ export function validateZoomCapability(text: string): RuleError[] {
       errors.push({
         tag: entireTag,
         index: match.index,
-        message: "Erro de Acessibilidade: A meta viewport bloqueia o zoom do usuario (user-scalable=no).",
+        message: zoomUserScalableMessage,
       });
     }
 
@@ -95,7 +96,7 @@ export function validateZoomCapability(text: string): RuleError[] {
       errors.push({
         tag: entireTag,
         index: match.index,
-        message: `Erro de Acessibilidade: A meta viewport bloqueia o zoom do usuario (maximum-scale=${directives["maximum-scale"]}).`,
+        message: zoomMaximumScaleMessage(directives["maximum-scale"]),
       });
     }
   }

@@ -1,5 +1,6 @@
 import { RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
+import { focusVisualRemovalHtmlMessage } from "./educationMessages";
 
 // Captura tags de abertura HTML e o nome da tag no grupo 1.
 const OPENING_TAG_REGEX = /<([a-z][\w:-]*)\b[^>]*>/gi;
@@ -101,7 +102,7 @@ export function validateHtmlFocusVisible(text: string): RuleError[] {
     errors.push({
       tag: entireTag,
       index: match.index,
-      message: "Erro de Acessibilidade: Elemento focavel remove o foco visual inline (outline: none/0) sem indicador alternativo.",
+      message: focusVisualRemovalHtmlMessage,
     });
   }
 

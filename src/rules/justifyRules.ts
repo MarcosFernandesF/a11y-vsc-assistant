@@ -1,4 +1,5 @@
 import { RuleError } from "./types";
+import { justifyTextMessage } from "./educationMessages";
 
 /**
  * Valida se o CSS possui uso de text-align: justify.
@@ -16,7 +17,7 @@ export function validateJustifiedCss(text: string): RuleError[] {
     errors.push({
       tag: match[0],
       index: match.index,
-      message: "Erro de Acessibilidade: Evite usar text-align: justify, pois pode prejudicar a legibilidade.",
+      message: justifyTextMessage,
     });
   }
 
