@@ -1,10 +1,13 @@
 function buildEducationalMessage(problem: string, impact: string, fix: string): string {
   return [
-    `Erro de Acessibilidade: ${problem}`,
+    "[Problema detectado]",
+    `- ${problem}`,
     "",
-    `Contexto: ${impact}`,
+    "[Por que isso importa]",
+    `- ${impact}`,
     "",
-    `Como corrigir: ${fix}`,
+    "[Como corrigir]",
+    `- ${fix}`,
   ].join("\n");
 }
 
