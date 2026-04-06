@@ -18,6 +18,7 @@ export function validateJustifiedCss(text: string): RuleError[] {
       tag: match[0],
       index: match.index,
       message: justifyTextMessage,
+      wcagReferenceKey: "justifyText",
     });
   }
 

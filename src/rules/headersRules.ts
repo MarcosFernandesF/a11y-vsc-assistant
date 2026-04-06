@@ -40,6 +40,7 @@ export function validateHeadersOrder(text: string): RuleError[] {
         tag: header.text,
         index: header.index,
         message: headersHierarchySkipMessage(header.text),
+        wcagReferenceKey: "headersHierarchy",
       });
     }
 
@@ -48,6 +49,7 @@ export function validateHeadersOrder(text: string): RuleError[] {
         tag: header.text,
         index: header.index,
         message: headersMultipleH1Message(header.text),
+        wcagReferenceKey: "headersHierarchy",
       });
     }
 
@@ -56,6 +58,7 @@ export function validateHeadersOrder(text: string): RuleError[] {
         tag: header.text,
         index: header.index,
         message: headersDecreasingOrderMessage(header.text),
+        wcagReferenceKey: "headersHierarchy",
       });
     }
 

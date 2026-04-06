@@ -9,6 +9,7 @@ import { validateHtmlFocusVisible } from './rules/focusHtmlRules';
 import { validatePageLanguage } from './rules/languageRules';
 import { validateDuplicateIds } from './rules/duplicateIdsRules';
 import { RuleError } from './rules/types';
+import { getWcagReference } from './rules/wcagReferences';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
 let diagnosticsCollection: vscode.DiagnosticCollection | undefined = undefined;
@@ -133,6 +134,15 @@ function mapRuleErrorsToDiagnostics(document: vscode.TextDocument, errors: RuleE
 
 		const diagnostic = new vscode.Diagnostic(range, error.message, vscode.DiagnosticSeverity.Warning);
 		diagnostic.source = 'A11y Assistant';
+
+		if (error.wcagReferenceKey) {
+			const reference = getWcagReference(error.wcagReferenceKey);
+			diagnostic.code = {
+				value: `WCAG ${reference.criterion}`,
+				target: vscode.Uri.parse(reference.url),
+			};
+		}
+
 		return diagnostic;
 	});
 }

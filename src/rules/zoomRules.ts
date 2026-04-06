@@ -89,6 +89,7 @@ export function validateZoomCapability(text: string): RuleError[] {
         tag: entireTag,
         index: match.index,
         message: zoomUserScalableMessage,
+        wcagReferenceKey: "zoomCapability",
       });
     }
 
@@ -97,6 +98,7 @@ export function validateZoomCapability(text: string): RuleError[] {
         tag: entireTag,
         index: match.index,
         message: zoomMaximumScaleMessage(directives["maximum-scale"]),
+        wcagReferenceKey: "zoomCapability",
       });
     }
   }

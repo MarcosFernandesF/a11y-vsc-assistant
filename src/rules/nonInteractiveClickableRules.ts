@@ -65,6 +65,7 @@ export function validateNonInteractiveClickableElements(text: string): RuleError
       tag: entireTag,
       index: match.index,
       message: nonInteractiveClickableMessage,
+      wcagReferenceKey: "nonInteractiveClickable",
     });
   }
 

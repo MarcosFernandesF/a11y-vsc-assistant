@@ -26,6 +26,7 @@ export function validatePageLanguage(text: string): RuleError[] {
       tag: htmlTag,
       index: rootMatch.index,
       message: missingPageLanguageMessage,
+      wcagReferenceKey: "pageLanguage",
     });
   }
 

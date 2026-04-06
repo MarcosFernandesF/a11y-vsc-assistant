@@ -103,6 +103,7 @@ export function validateHtmlFocusVisible(text: string): RuleError[] {
       tag: entireTag,
       index: match.index,
       message: focusVisualRemovalHtmlMessage,
+      wcagReferenceKey: "focusVisualRemovalHtml",
     });
   }
 

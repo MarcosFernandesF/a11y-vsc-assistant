@@ -67,6 +67,7 @@ export function validateFocusVisualRemoval(text: string): RuleError[] {
         tag: outlineMatch[0],
         index: declarationsStartIndex + outlineMatch.index,
         message: focusVisualRemovalCssMessage,
+        wcagReferenceKey: "focusVisualRemovalCss",
       });
     }
   }

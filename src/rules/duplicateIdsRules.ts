@@ -30,6 +30,7 @@ export function validateDuplicateIds(text: string): RuleError[] {
         tag: entireTag,
         index: match.index,
         message: duplicateIdMessage(id),
+        wcagReferenceKey: "duplicateIds",
       });
       continue;
     }

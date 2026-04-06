@@ -23,7 +23,8 @@ export function validateImagesWithoutAlt(text: string): RuleError[] {
       errors.push({
         tag: entireTag,
         index: match.index,
-        message: imageAltMessage
+        message: imageAltMessage,
+        wcagReferenceKey: "imageAlt",
       });
     }
   }
