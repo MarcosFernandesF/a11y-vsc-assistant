@@ -120,7 +120,7 @@ function mapRuleErrorsToDiagnostics(document: vscode.TextDocument, errors: RuleE
 
 	return errors.map(error => {
 		const startOffset = Math.max(0, Math.min(error.index, textLength));
-		const rawTagLength = error.tag?.length ?? 0;
+		const rawTagLength = error.tagLength ?? error.tag?.length ?? 0;
 		let endOffset = Math.max(startOffset, Math.min(startOffset + Math.max(rawTagLength, 1), textLength));
 
 		if (endOffset === startOffset && startOffset < textLength) {

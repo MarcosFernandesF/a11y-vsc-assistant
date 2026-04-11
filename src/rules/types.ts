@@ -9,4 +9,5 @@ export interface RuleError {
   index: number;
   message: string;
   wcagReferenceKey?: WcagReferenceKey;
+  tagLength?: number;
 }
