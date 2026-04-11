@@ -1,0 +1,59 @@
+{
+  "name": "a11y-vsc-assistant",
+  "displayName": "A11y VSCode Assistant",
+  "description": "Assistente proativo de acessibilidade web para análise em tempo real de diretrizes WCAG 2.2 em arquivos HTML e CSS",
+  "version": "0.0.1",
+  "publisher": "MarcosFernandesF",
+  "author": {
+    "name": "Marcos Roberto Fernandes Filho",
+    "email": "marcosrff.2001@gmail.com"
+  },
+  "engines": {
+    "vscode": "^1.110.0"
+  },
+  "categories": [
+    "Linters",
+    "Education",
+    "Other"
+  ],
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "wcag",
+    "html",
+    "css",
+    "education"
+  ],
+  "activationEvents": [
+    "onLanguage:html",
+    "onLanguage:css"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "a11y-vsc-assistant.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "test:rules": "npm run compile && node run-tests.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.110.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.56.1",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
