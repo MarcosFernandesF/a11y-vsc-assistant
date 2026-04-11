@@ -138,7 +138,7 @@ function mapRuleErrorsToDiagnostics(document: vscode.TextDocument, errors: RuleE
 		if (error.wcagReferenceKey) {
 			const reference = getWcagReference(error.wcagReferenceKey);
 			diagnostic.code = {
-				value: `WCAG ${reference.criterion}`,
+				value: `WCAG ${reference.criterion} - ${reference.title}`,
 				target: vscode.Uri.parse(reference.url),
 			};
 		}

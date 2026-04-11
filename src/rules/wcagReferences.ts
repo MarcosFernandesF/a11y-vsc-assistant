@@ -66,11 +66,6 @@ export const WCAG_REFERENCES: Record<WcagReferenceKey, WcagReference> = {
   },
 };
 
-export function formatWcagReference(referenceKey: WcagReferenceKey): string {
-  const reference = WCAG_REFERENCES[referenceKey];
-  return `${reference.criterion} ${reference.title}: ${reference.url}`;
-}
-
 export function getWcagReference(referenceKey: WcagReferenceKey): WcagReference {
   return WCAG_REFERENCES[referenceKey];
 }

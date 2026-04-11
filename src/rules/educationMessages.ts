@@ -1,4 +1,4 @@
-import { formatWcagReference, WcagReferenceKey } from "./wcagReferences";
+import { WcagReferenceKey } from "./wcagReferences";
 
 function buildEducationalMessage(problem: string, impact: string, fix: string, referenceKey: WcagReferenceKey): string {
   return [
@@ -12,7 +12,6 @@ function buildEducationalMessage(problem: string, impact: string, fix: string, r
     `- ${fix}`,
     "",
     "[Fonte oficial WCAG 2.2]",
-    `- ${formatWcagReference(referenceKey)}`,
   ].join("\n");
 }
 
