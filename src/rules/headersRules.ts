@@ -1,4 +1,9 @@
 import { RuleError } from "./types";
+import {
+  headersDecreasingOrderMessage,
+  headersHierarchySkipMessage,
+  headersMultipleH1Message,
+} from "./educationMessages";
 
 /**
  * Valida se os cabeçalhos estão em um ordem lógica (h1 a h6).
@@ -34,7 +39,8 @@ export function validateHeadersOrder(text: string): RuleError[] {
       errors.push({
         tag: header.text,
         index: header.index,
-        message: `Erro de Acessibilidade: Pulo de hierarquia detectado (${header.text}).`,
+        message: headersHierarchySkipMessage(header.text),
+        wcagReferenceKey: "headersHierarchy",
       });
     }
 
@@ -42,7 +48,8 @@ export function validateHeadersOrder(text: string): RuleError[] {
       errors.push({
         tag: header.text,
         index: header.index,
-        message: `Erro de Acessibilidade: Não pode haver múltiplos h1 na página (${header.text}).`,
+        message: headersMultipleH1Message(header.text),
+        wcagReferenceKey: "headersHierarchy",
       });
     }
 
@@ -50,7 +57,8 @@ export function validateHeadersOrder(text: string): RuleError[] {
       errors.push({
         tag: header.text,
         index: header.index,
-        message: `Erro de Acessibilidade: Hierarquia de headers deve ser crescente (${header.text}).`,
+        message: headersDecreasingOrderMessage(header.text),
+        wcagReferenceKey: "headersHierarchy",
       });
     }
 

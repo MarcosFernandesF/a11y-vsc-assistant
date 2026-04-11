@@ -1,4 +1,5 @@
 import { RuleError } from "./types";
+import { imageAltMessage } from "./educationMessages";
 
 /**
  * Valida se as tags <img> possuem um atributo 'alt' não vazio.
@@ -22,7 +23,8 @@ export function validateImagesWithoutAlt(text: string): RuleError[] {
       errors.push({
         tag: entireTag,
         index: match.index,
-        message: "Erro de Acessibilidade: A tag <img> deve ter um atributo 'alt' descritivo."
+        message: imageAltMessage,
+        wcagReferenceKey: "imageAlt",
       });
     }
   }

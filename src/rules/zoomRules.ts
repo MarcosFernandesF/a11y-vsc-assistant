@@ -1,5 +1,6 @@
 import { RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
+import { zoomMaximumScaleMessage, zoomUserScalableMessage } from "./educationMessages";
 
 // Localiza rapidamente cada tag <meta ...> no HTML para filtrar apenas
 // as meta viewport, sem depender de parser DOM no contexto da extensao.
@@ -25,6 +26,15 @@ function parseViewportContent(content: string): Record<string, string> {
   }
 
   return directives;
+}
+
+/**
+ * Encontra o índice de um atributo específico dentro da tag inteira.
+ */
+function getAttributeIndexInTag(tag: string, attributeName: string): { index: number; length: number } | null {
+  const regex = new RegExp(`\\b${attributeName}\\s*=\\s*["\']?[^"\'\\s>]+["\']?`, "i");
+  const match = regex.exec(tag);
+  return match ? { index: match.index, length: match[0].length } : null;
 }
 
 /**
@@ -84,19 +94,29 @@ export function validateZoomCapability(text: string): RuleError[] {
     }
 
     if (hasUserScalableNo) {
-      errors.push({
-        tag: entireTag,
-        index: match.index,
-        message: "Erro de Acessibilidade: A meta viewport bloqueia o zoom do usuario (user-scalable=no).",
-      });
+      const userScalableAttr = getAttributeIndexInTag(entireTag, "user-scalable");
+      if (userScalableAttr) {
+        errors.push({
+          tag: entireTag,
+          index: match.index + userScalableAttr.index,
+          message: zoomUserScalableMessage,
+          wcagReferenceKey: "zoomCapability",
+          tagLength: userScalableAttr.length,
+        });
+      }
     }
 
     if (hasMaximumScaleBlocking) {
-      errors.push({
-        tag: entireTag,
-        index: match.index,
-        message: `Erro de Acessibilidade: A meta viewport bloqueia o zoom do usuario (maximum-scale=${directives["maximum-scale"]}).`,
-      });
+      const maximumScaleAttr = getAttributeIndexInTag(entireTag, "maximum-scale");
+      if (maximumScaleAttr) {
+        errors.push({
+          tag: entireTag,
+          index: match.index + maximumScaleAttr.index,
+          message: zoomMaximumScaleMessage(directives["maximum-scale"]),
+          wcagReferenceKey: "zoomCapability",
+          tagLength: maximumScaleAttr.length,
+        });
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import { RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
+import { missingPageLanguageMessage } from "./educationMessages";
 
 // Captura a tag raiz <html ...> para validar o idioma padrão da pagina.
 const HTML_ROOT_TAG_REGEX = /<html\b[^>]*>/i;
@@ -24,7 +25,8 @@ export function validatePageLanguage(text: string): RuleError[] {
     errors.push({
       tag: htmlTag,
       index: rootMatch.index,
-      message: "Erro de Acessibilidade: A tag <html> deve definir o atributo lang com o idioma da pagina.",
+      message: missingPageLanguageMessage,
+      wcagReferenceKey: "pageLanguage",
     });
   }
 

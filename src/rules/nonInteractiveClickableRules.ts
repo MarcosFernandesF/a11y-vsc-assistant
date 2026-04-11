@@ -1,5 +1,6 @@
 import { RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
+import { nonInteractiveClickableMessage } from "./educationMessages";
 
 // Captura tags de abertura HTML e extrai o nome da tag no grupo 1.
 const OPENING_TAG_REGEX = /<([a-z][\w:-]*)\b[^>]*>/gi;
@@ -63,7 +64,8 @@ export function validateNonInteractiveClickableElements(text: string): RuleError
     errors.push({
       tag: entireTag,
       index: match.index,
-      message: "Erro de Acessibilidade: Elemento nao interativo com clique deve ter role e/ou tabindex para acesso por teclado.",
+      message: nonInteractiveClickableMessage,
+      wcagReferenceKey: "nonInteractiveClickable",
     });
   }
 

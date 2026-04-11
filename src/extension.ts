@@ -9,6 +9,7 @@ import { validateHtmlFocusVisible } from './rules/focusHtmlRules';
 import { validatePageLanguage } from './rules/languageRules';
 import { validateDuplicateIds } from './rules/duplicateIdsRules';
 import { RuleError } from './rules/types';
+import { getWcagReference } from './rules/wcagReferences';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
 let diagnosticsCollection: vscode.DiagnosticCollection | undefined = undefined;
@@ -119,7 +120,7 @@ function mapRuleErrorsToDiagnostics(document: vscode.TextDocument, errors: RuleE
 
 	return errors.map(error => {
 		const startOffset = Math.max(0, Math.min(error.index, textLength));
-		const rawTagLength = error.tag?.length ?? 0;
+		const rawTagLength = error.tagLength ?? error.tag?.length ?? 0;
 		let endOffset = Math.max(startOffset, Math.min(startOffset + Math.max(rawTagLength, 1), textLength));
 
 		if (endOffset === startOffset && startOffset < textLength) {
@@ -133,6 +134,15 @@ function mapRuleErrorsToDiagnostics(document: vscode.TextDocument, errors: RuleE
 
 		const diagnostic = new vscode.Diagnostic(range, error.message, vscode.DiagnosticSeverity.Warning);
 		diagnostic.source = 'A11y Assistant';
+
+		if (error.wcagReferenceKey) {
+			const reference = getWcagReference(error.wcagReferenceKey);
+			diagnostic.code = {
+				value: `WCAG ${reference.criterion} - ${reference.title}`,
+				target: vscode.Uri.parse(reference.url),
+			};
+		}
+
 		return diagnostic;
 	});
 }

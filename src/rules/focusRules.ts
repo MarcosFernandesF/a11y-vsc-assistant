@@ -1,4 +1,5 @@
 import { RuleError } from "./types";
+import { focusVisualRemovalCssMessage } from "./educationMessages";
 
 // Divide o CSS em blocos "seletor { declaracoes }" para avaliacao por contexto.
 const CSS_BLOCK_REGEX = /([^{}]+)\{([^}]*)\}/g;
@@ -65,7 +66,8 @@ export function validateFocusVisualRemoval(text: string): RuleError[] {
       errors.push({
         tag: outlineMatch[0],
         index: declarationsStartIndex + outlineMatch.index,
-        message: "Erro de Acessibilidade: Evite remover o foco visual (outline: none/0) sem indicador alternativo visivel.",
+        message: focusVisualRemovalCssMessage,
+        wcagReferenceKey: "focusVisualRemovalCss",
       });
     }
   }
