@@ -10,9 +10,11 @@ import { validatePageLanguage } from './rules/languageRules';
 import { validateDuplicateIds } from './rules/duplicateIdsRules';
 import { RuleError } from './rules/types';
 import { getWcagReference } from './rules/wcagReferences';
+import { A11yErrorTreeItem, A11yErrorsTreeDataProvider } from './errorSummaryProvider';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
 let diagnosticsCollection: vscode.DiagnosticCollection | undefined = undefined;
+let errorSummaryProvider: A11yErrorsTreeDataProvider | undefined = undefined;
 
 /**
  * Inicializa a extensao, registra a collection de diagnosticos e configura
@@ -21,7 +23,26 @@ let diagnosticsCollection: vscode.DiagnosticCollection | undefined = undefined;
 export function activate(context: vscode.ExtensionContext) {
 	console.log('A11y Assistant Funcionando.');
 	diagnosticsCollection = vscode.languages.createDiagnosticCollection('a11y-vsc-assistant');
+	errorSummaryProvider = new A11yErrorsTreeDataProvider();
 	context.subscriptions.push(diagnosticsCollection);
+
+	const errorSummaryTreeView = vscode.window.createTreeView('a11yErrorSummary', {
+		treeDataProvider: errorSummaryProvider,
+		showCollapseAll: false,
+	});
+
+	const revealErrorCommand = vscode.commands.registerCommand(
+		'a11y-vsc-assistant.revealErrorFromPanel',
+		async (item: A11yErrorTreeItem) => {
+			const document = await vscode.workspace.openTextDocument(item.uri);
+			const editor = await vscode.window.showTextDocument(document, { preview: false, preserveFocus: false });
+			editor.selection = new vscode.Selection(item.range.start, item.range.start);
+			editor.revealRange(item.range, vscode.TextEditorRevealType.InCenter);
+		}
+	);
+
+	context.subscriptions.push(errorSummaryTreeView);
+	context.subscriptions.push(revealErrorCommand);
 
 	if (vscode.window.activeTextEditor) {
 		const doc = vscode.window.activeTextEditor.document;
@@ -29,6 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 			processValidation(doc);
 		} else {
 			clearDiagnostics(doc);
+			errorSummaryProvider?.clear();
 		}
 	}
 
@@ -45,6 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}, 500);
 		} else {
 			clearDiagnostics(document);
+			errorSummaryProvider?.clear();
 		}
 	});
 
@@ -58,6 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
 			processValidation(document);
 		} else {
 			clearDiagnostics(document);
+			errorSummaryProvider?.clear();
 		}
 	});
 
@@ -75,6 +99,7 @@ export function deactivate() {
 
 	diagnosticsCollection?.clear();
 	diagnosticsCollection = undefined;
+	errorSummaryProvider = undefined;
 }
 
 /**
@@ -104,6 +129,7 @@ function processValidation(document: vscode.TextDocument): void {
 
 	const diagnostics = mapRuleErrorsToDiagnostics(document, errors);
 	diagnosticsCollection?.set(document.uri, diagnostics);
+	errorSummaryProvider?.setErrors(document, errors);
 
 	errors.forEach(error => {
 		const startPosition = document.positionAt(error.index);
@@ -159,4 +185,5 @@ function isFileExtensionValid(document: vscode.TextDocument): boolean {
  */
 function clearDiagnostics(document: vscode.TextDocument): void {
 	diagnosticsCollection?.delete(document.uri);
+	errorSummaryProvider?.clear();
 }
