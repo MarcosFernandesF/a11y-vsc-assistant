@@ -10,11 +10,12 @@ import { validatePageLanguage } from './rules/languageRules';
 import { validateDuplicateIds } from './rules/duplicateIdsRules';
 import { RuleError } from './rules/types';
 import { getWcagReference } from './rules/wcagReferences';
-import { A11yErrorTreeItem, A11yErrorsTreeDataProvider } from './errorSummaryProvider';
+import { A11yErrorTreeItem, A11yErrorsTreeDataProvider, A11yTreeItem } from './errorSummaryProvider';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
 let diagnosticsCollection: vscode.DiagnosticCollection | undefined = undefined;
 let errorSummaryProvider: A11yErrorsTreeDataProvider | undefined = undefined;
+let errorSummaryTreeView: vscode.TreeView<A11yTreeItem> | undefined = undefined;
 
 /**
  * Inicializa a extensao, registra a collection de diagnosticos e configura
@@ -23,10 +24,10 @@ let errorSummaryProvider: A11yErrorsTreeDataProvider | undefined = undefined;
 export function activate(context: vscode.ExtensionContext) {
 	console.log('A11y Assistant Funcionando.');
 	diagnosticsCollection = vscode.languages.createDiagnosticCollection('a11y-vsc-assistant');
-	errorSummaryProvider = new A11yErrorsTreeDataProvider();
+	errorSummaryProvider = new A11yErrorsTreeDataProvider(context.extensionUri);
 	context.subscriptions.push(diagnosticsCollection);
 
-	const errorSummaryTreeView = vscode.window.createTreeView('a11yErrorSummary', {
+	errorSummaryTreeView = vscode.window.createTreeView('a11yErrorSummary', {
 		treeDataProvider: errorSummaryProvider,
 		showCollapseAll: false,
 	});
@@ -53,6 +54,8 @@ export function activate(context: vscode.ExtensionContext) {
 			errorSummaryProvider?.clear();
 		}
 	}
+
+	updateErrorSummaryBadge();
 
 	const documentChangeEvent = vscode.workspace.onDidChangeTextDocument(event => {
 		const document = event.document;
@@ -100,6 +103,7 @@ export function deactivate() {
 	diagnosticsCollection?.clear();
 	diagnosticsCollection = undefined;
 	errorSummaryProvider = undefined;
+	errorSummaryTreeView = undefined;
 }
 
 /**
@@ -130,6 +134,7 @@ function processValidation(document: vscode.TextDocument): void {
 	const diagnostics = mapRuleErrorsToDiagnostics(document, errors);
 	diagnosticsCollection?.set(document.uri, diagnostics);
 	errorSummaryProvider?.setErrors(document, errors);
+	updateErrorSummaryBadge();
 
 	errors.forEach(error => {
 		const startPosition = document.positionAt(error.index);
@@ -186,4 +191,30 @@ function isFileExtensionValid(document: vscode.TextDocument): boolean {
 function clearDiagnostics(document: vscode.TextDocument): void {
 	diagnosticsCollection?.delete(document.uri);
 	errorSummaryProvider?.clear();
+	updateErrorSummaryBadge();
+}
+
+/**
+ * Atualiza a apresentacao do painel de resumo com base no total atual de erros,
+ * sincronizando descricao, badge numerico e mensagem de estado vazio.
+ */
+function updateErrorSummaryBadge(): void {
+	if (!errorSummaryTreeView || !errorSummaryProvider) {
+		return;
+	}
+
+	const totalErrors = errorSummaryProvider.getTotalErrors();
+	errorSummaryTreeView.description = `Total: ${totalErrors}`;
+
+	if (totalErrors <= 0) {
+		errorSummaryTreeView.badge = undefined;
+		errorSummaryTreeView.message = 'Sem erros de acessibilidade no arquivo ativo.';
+		return;
+	}
+
+	errorSummaryTreeView.badge = {
+		value: totalErrors,
+		tooltip: `${totalErrors} erro(s) de acessibilidade no arquivo ativo`,
+	};
+	errorSummaryTreeView.message = undefined;
 }
