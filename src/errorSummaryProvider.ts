@@ -1,5 +1,32 @@
 import * as vscode from 'vscode';
 import { RuleError } from './rules/types';
+import type { WcagReferenceKey } from './rules/wcagReferences';
+
+const ERROR_CATEGORY_BY_REFERENCE: Record<WcagReferenceKey, string> = {
+  duplicateIds: 'Erros de Estrutura',
+  headersHierarchy: 'Erros de Estrutura',
+  pageLanguage: 'Erros de Estrutura',
+  imageAlt: 'Erros de Conteudo',
+  focusVisualRemovalCss: 'Erros de Foco e Navegacao',
+  focusVisualRemovalHtml: 'Erros de Foco e Navegacao',
+  nonInteractiveClickable: 'Erros de Interacao',
+  justifyText: 'Erros de Apresentacao Visual',
+  zoomCapability: 'Erros de Zoom e Viewport',
+};
+
+export type A11yTreeItem = A11yErrorCategoryTreeItem | A11yErrorTreeItem;
+
+export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
+  constructor(
+    public readonly categoryName: string,
+    public readonly children: A11yErrorTreeItem[]
+  ) {
+    super(categoryName, vscode.TreeItemCollapsibleState.Expanded);
+    this.description = `${children.length} erro(s)`;
+    this.contextValue = 'a11yErrorCategory';
+    this.iconPath = new vscode.ThemeIcon('folder-library');
+  }
+}
 
 /**
  * Item exibido no painel de resumo de erros com contexto para navegacao.
@@ -38,28 +65,52 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
 /**
  * Provedor de dados do TreeView para apresentar o resumo de erros.
  */
-export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yErrorTreeItem> {
+export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yTreeItem> {
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
-  private items: A11yErrorTreeItem[] = [];
+  private categoryItems: A11yErrorCategoryTreeItem[] = [];
 
   setErrors(document: vscode.TextDocument, errors: RuleError[]): void {
-    this.items = errors.map(error => new A11yErrorTreeItem(document, error));
+    const grouped = new Map<string, A11yErrorTreeItem[]>();
+
+    for (const error of errors) {
+      const category = getErrorCategory(error);
+      const categoryChildren = grouped.get(category) ?? [];
+      categoryChildren.push(new A11yErrorTreeItem(document, error));
+      grouped.set(category, categoryChildren);
+    }
+
+    this.categoryItems = Array.from(grouped.entries())
+      .map(([categoryName, children]) => new A11yErrorCategoryTreeItem(categoryName, children))
+      .sort((a, b) => b.children.length - a.children.length || a.categoryName.localeCompare(b.categoryName));
+
     this.onDidChangeTreeDataEmitter.fire();
   }
 
   clear(): void {
-    this.items = [];
+    this.categoryItems = [];
     this.onDidChangeTreeDataEmitter.fire();
   }
 
-  getTreeItem(element: A11yErrorTreeItem): vscode.TreeItem {
+  getTreeItem(element: A11yTreeItem): vscode.TreeItem {
     return element;
   }
 
-  getChildren(): vscode.ProviderResult<A11yErrorTreeItem[]> {
-    return this.items;
+  getChildren(element?: A11yTreeItem): vscode.ProviderResult<A11yTreeItem[]> {
+    if (!element) {
+      return this.categoryItems;
+    }
+
+    if (element instanceof A11yErrorCategoryTreeItem) {
+      return element.children;
+    }
+
+    return [];
+  }
+
+  getTotalErrors(): number {
+    return this.categoryItems.reduce((total, category) => total + category.children.length, 0);
   }
 }
 
@@ -95,4 +146,12 @@ function extractPanelTitle(message: string): string {
   }
 
   return lines[0].replace(/^-\s*/, '');
+}
+
+function getErrorCategory(error: RuleError): string {
+  if (error.wcagReferenceKey) {
+    return ERROR_CATEGORY_BY_REFERENCE[error.wcagReferenceKey];
+  }
+
+  return 'Outros Erros';
 }
