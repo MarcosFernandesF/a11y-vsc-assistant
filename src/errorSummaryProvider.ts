@@ -14,17 +14,28 @@ const ERROR_CATEGORY_BY_REFERENCE: Record<WcagReferenceKey, string> = {
   zoomCapability: 'Erros de Zoom e Viewport',
 };
 
+const CATEGORY_ICON_BY_NAME: Record<string, string> = {
+  'Erros de Estrutura': 'structure.svg',
+  'Erros de Conteudo': 'content.svg',
+  'Erros de Foco e Navegacao': 'focus.svg',
+  'Erros de Interacao': 'interaction.svg',
+  'Erros de Apresentacao Visual': 'visual.svg',
+  'Erros de Zoom e Viewport': 'zoom.svg',
+  'Outros Erros': 'others.svg',
+};
+
 export type A11yTreeItem = A11yErrorCategoryTreeItem | A11yErrorTreeItem;
 
 export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
   constructor(
     public readonly categoryName: string,
-    public readonly children: A11yErrorTreeItem[]
+    public readonly children: A11yErrorTreeItem[],
+    iconPath: vscode.Uri | vscode.ThemeIcon
   ) {
     super(categoryName, vscode.TreeItemCollapsibleState.Expanded);
     this.description = `${children.length} erro(s)`;
     this.contextValue = 'a11yErrorCategory';
-    this.iconPath = new vscode.ThemeIcon('folder-library');
+    this.iconPath = iconPath;
   }
 }
 
@@ -66,6 +77,8 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
  * Provedor de dados do TreeView para apresentar o resumo de erros.
  */
 export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yTreeItem> {
+  constructor(private readonly extensionUri: vscode.Uri) {}
+
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
@@ -82,7 +95,10 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
     }
 
     this.categoryItems = Array.from(grouped.entries())
-      .map(([categoryName, children]) => new A11yErrorCategoryTreeItem(categoryName, children))
+      .map(([categoryName, children]) => {
+        const iconPath = this.getCategoryIconPath(categoryName);
+        return new A11yErrorCategoryTreeItem(categoryName, children, iconPath);
+      })
       .sort((a, b) => b.children.length - a.children.length || a.categoryName.localeCompare(b.categoryName));
 
     this.onDidChangeTreeDataEmitter.fire();
@@ -111,6 +127,16 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
 
   getTotalErrors(): number {
     return this.categoryItems.reduce((total, category) => total + category.children.length, 0);
+  }
+
+  private getCategoryIconPath(categoryName: string): vscode.Uri | vscode.ThemeIcon {
+    const fileName = CATEGORY_ICON_BY_NAME[categoryName];
+
+    if (!fileName) {
+      return new vscode.ThemeIcon('folder-library');
+    }
+
+    return vscode.Uri.joinPath(this.extensionUri, 'media', 'categories', fileName);
   }
 }
 
