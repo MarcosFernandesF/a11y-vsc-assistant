@@ -30,10 +30,28 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "a11yAssistant",
+          "title": "A11y Assistant",
+          "icon": "media/accessibility-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "a11yAssistant": [
+        {
+          "id": "a11yErrorSummary",
+          "name": "Resumo de Erros",
+          "icon": "media/accessibility-icon.svg"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "a11y-vsc-assistant.helloWorld",
-        "title": "Hello World"
+        "command": "a11y-vsc-assistant.revealErrorFromPanel",
+        "title": "A11y: Ir para Erro no Código"
       }
     ]
   },
@@ -55,5 +73,9 @@
     "typescript": "^5.9.3",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2"
+  },
+  "overrides": {
+    "diff": ">=8.0.3",
+    "serialize-javascript": ">=7.0.5"
   }
 }
