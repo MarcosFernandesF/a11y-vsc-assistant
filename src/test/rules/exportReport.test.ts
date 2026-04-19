@@ -28,26 +28,20 @@ function runExportReportTests() {
     ],
   });
 
-  const parsed = JSON.parse(reportText) as {
-    generatedAt: string;
-    sourceFile: string;
-    totalErrors: number;
-    errors: Array<{ summary: string; line: number; column: number }>;
-  };
+  assert.ok(reportText.startsWith('<!DOCTYPE html>'));
+  assert.ok(reportText.includes('<html lang="pt-BR">'));
+  assert.ok(reportText.includes('Relatorio de acessibilidade'));
+  assert.ok(reportText.includes('Problemas encontrados'));
+  assert.ok(reportText.includes('ID duplicado detectado'));
+  assert.ok(reportText.includes('Imagem sem texto alternativo'));
+  assert.ok(reportText.includes('Linha 4, coluna 5'));
+  assert.ok(reportText.includes('examples/duplicate-ids-test.html'));
 
-  assert.strictEqual(parsed.generatedAt, fixedDate.toISOString());
-  assert.strictEqual(parsed.sourceFile, 'examples/duplicate-ids-test.html');
-  assert.strictEqual(parsed.totalErrors, 2);
-  assert.strictEqual(parsed.errors.length, 2);
-  assert.strictEqual(parsed.errors[0].summary, 'ID duplicado detectado');
-  assert.strictEqual(parsed.errors[0].line, 4);
-  assert.strictEqual(parsed.errors[0].column, 5);
-
-  const reportFileName = buildSafeReportFileName('duplicate ids test.html', fixedDate);
+  const reportFileName = buildSafeReportFileName('duplicate ids test.html', fixedDate, 'html');
 
   assert.strictEqual(
     reportFileName,
-    'a11y-report-duplicate_ids_test.html-2026-04-14T10-20-30Z.json'
+    'a11y-report-duplicate_ids_test.html-2026-04-14T10-20-30Z.html'
   );
 
   console.log('Resultado Final: 2/2 testes passaram.\n');
