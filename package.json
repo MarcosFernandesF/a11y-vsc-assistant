@@ -52,8 +52,25 @@
       {
         "command": "a11y-vsc-assistant.revealErrorFromPanel",
         "title": "A11y: Ir para Erro no Código"
+      },
+      {
+        "command": "a11y-vsc-assistant.exportAccessibilityReport",
+        "title": "A11y: Baixar relatório de acessibilidade",
+        "icon": {
+          "light": "media/download-report.svg",
+          "dark": "media/download-report.svg"
+        }
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "a11y-vsc-assistant.exportAccessibilityReport",
+          "when": "view == a11yErrorSummary",
+          "group": "navigation@1"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
