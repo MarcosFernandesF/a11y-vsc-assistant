@@ -2,6 +2,14 @@ import * as vscode from 'vscode';
 import { RuleError } from './rules/types';
 import type { WcagReferenceKey } from './rules/wcagReferences';
 
+export type A11yPanelExportEntry = {
+  category: string;
+  summary: string;
+  details: string;
+  line: number;
+  column: number;
+};
+
 const ERROR_CATEGORY_BY_REFERENCE: Record<WcagReferenceKey, string> = {
   duplicateIds: 'Erros de Estrutura',
   headersHierarchy: 'Erros de Estrutura',
@@ -45,6 +53,8 @@ export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
 export class A11yErrorTreeItem extends vscode.TreeItem {
   public readonly uri: vscode.Uri;
   public readonly range: vscode.Range;
+  public readonly detailsMessage: string;
+  public readonly panelSummary: string;
 
   constructor(document: vscode.TextDocument, error: RuleError) {
     const startPosition = document.positionAt(error.index);
@@ -56,6 +66,8 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
 
     this.uri = document.uri;
     this.range = new vscode.Range(startPosition, endPosition);
+    this.panelSummary = panelTitle;
+    this.detailsMessage = error.message;
     this.description = `Linha ${startPosition.line + 1}, Coluna ${startPosition.character + 1}`;
     this.tooltip = new vscode.MarkdownString([
       `**Resumo:** ${panelTitle}`,
@@ -127,6 +139,18 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
 
   getTotalErrors(): number {
     return this.categoryItems.reduce((total, category) => total + category.children.length, 0);
+  }
+
+  getExportEntries(): A11yPanelExportEntry[] {
+    return this.categoryItems.flatMap(categoryItem =>
+      categoryItem.children.map(errorItem => ({
+        category: categoryItem.categoryName,
+        summary: errorItem.panelSummary,
+        details: errorItem.detailsMessage,
+        line: errorItem.range.start.line + 1,
+        column: errorItem.range.start.character + 1,
+      }))
+    );
   }
 
   private getCategoryIconPath(categoryName: string): vscode.Uri | vscode.ThemeIcon {
