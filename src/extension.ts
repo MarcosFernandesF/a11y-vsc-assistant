@@ -253,7 +253,7 @@ async function exportAccessibilityReport(): Promise<void> {
 
 	processValidation(document);
 
-	const exportEntries = errorSummaryProvider.getExportEntries();
+	const exportEntries = errorSummaryProvider.getExportEntries(document);
 	const reportText = formatA11yReport({
 		generatedAt: new Date().toISOString(),
 		sourceFile: vscode.workspace.asRelativePath(document.uri, false),

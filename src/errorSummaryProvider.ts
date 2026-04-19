@@ -8,6 +8,7 @@ export type A11yPanelExportEntry = {
   details: string;
   line: number;
   column: number;
+  codeSnippet: string;
   wcagReferenceKey?: WcagReferenceKey;
 };
 
@@ -144,7 +145,7 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
     return this.categoryItems.reduce((total, category) => total + category.children.length, 0);
   }
 
-  getExportEntries(): A11yPanelExportEntry[] {
+  getExportEntries(document: vscode.TextDocument): A11yPanelExportEntry[] {
     return this.categoryItems.flatMap(categoryItem =>
       categoryItem.children.map(errorItem => ({
         category: categoryItem.categoryName,
@@ -152,6 +153,7 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
         details: errorItem.detailsMessage,
         line: errorItem.range.start.line + 1,
         column: errorItem.range.start.character + 1,
+        codeSnippet: getCodeSnippet(document, errorItem.range),
         wcagReferenceKey: errorItem.wcagReferenceKey,
       }))
     );
@@ -208,4 +210,16 @@ function getErrorCategory(error: RuleError): string {
   }
 
   return 'Outros Erros';
+}
+
+function getCodeSnippet(document: vscode.TextDocument, range: vscode.Range): string {
+  const lineText = document.lineAt(range.start.line).text.trim();
+
+  if (lineText.length > 0) {
+    return lineText;
+  }
+
+  const snippet = document.getText(range).trim();
+
+  return snippet.length > 0 ? snippet : 'Trecho indisponivel';
 }

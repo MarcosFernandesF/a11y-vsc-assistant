@@ -6,6 +6,7 @@ export type A11yErrorExportItem = {
   details: string;
   line: number;
   column: number;
+  codeSnippet: string;
   wcagReferenceKey?: import('./rules/wcagReferences').WcagReferenceKey;
 };
 

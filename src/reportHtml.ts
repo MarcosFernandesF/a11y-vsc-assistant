@@ -263,6 +263,46 @@ export function createA11yReportHtml(payload: A11yReportPayload): string {
       font-size: 0.98rem;
     }
 
+    .code-snippet {
+      margin-top: 12px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(127, 29, 29, 0.22);
+      border-radius: 14px;
+      background: #fef2f2;
+      color: #7f1d1d;
+      overflow: auto;
+    }
+
+    .code-snippet-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(127, 29, 29, 0.16);
+      background: #dc2626;
+      color: #ffffff;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .code-snippet pre {
+      margin: 0;
+      padding: 14px;
+      overflow: auto;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .code-snippet code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      color: inherit;
+    }
+
     .reference-link {
       display: inline-flex;
       align-items: center;
@@ -382,6 +422,7 @@ function groupErrorsByCategory(errors: A11yErrorExportItem[]): Array<{ category:
 
 function renderErrorCard(error: A11yErrorExportItem): string {
   const messageParts = parseEducationalMessage(error.details);
+  const codeSnippet = escapeHtml(error.codeSnippet);
 
   return `
     <article class="error-card">
@@ -389,6 +430,10 @@ function renderErrorCard(error: A11yErrorExportItem): string {
         <h3>${escapeHtml(error.summary)}</h3>
         <span class="error-location">Linha ${error.line}, coluna ${error.column}</span>
       </div>
+      <section class="code-snippet" aria-label="Trecho do código problemático">
+        <div class="code-snippet-header">Trecho problemático</div>
+        <pre><code>${codeSnippet}</code></pre>
+      </section>
       <div class="message-sections">
         ${messageParts.map(section => renderMessageSection(section, error.wcagReferenceKey)).join('\n')}
       </div>
