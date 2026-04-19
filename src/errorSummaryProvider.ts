@@ -8,6 +8,7 @@ export type A11yPanelExportEntry = {
   details: string;
   line: number;
   column: number;
+  wcagReferenceKey?: WcagReferenceKey;
 };
 
 const ERROR_CATEGORY_BY_REFERENCE: Record<WcagReferenceKey, string> = {
@@ -55,6 +56,7 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
   public readonly range: vscode.Range;
   public readonly detailsMessage: string;
   public readonly panelSummary: string;
+  public readonly wcagReferenceKey?: WcagReferenceKey;
 
   constructor(document: vscode.TextDocument, error: RuleError) {
     const startPosition = document.positionAt(error.index);
@@ -68,6 +70,7 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
     this.range = new vscode.Range(startPosition, endPosition);
     this.panelSummary = panelTitle;
     this.detailsMessage = error.message;
+    this.wcagReferenceKey = error.wcagReferenceKey;
     this.description = `Linha ${startPosition.line + 1}, Coluna ${startPosition.character + 1}`;
     this.tooltip = new vscode.MarkdownString([
       `**Resumo:** ${panelTitle}`,
@@ -89,7 +92,7 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
  * Provedor de dados do TreeView para apresentar o resumo de erros.
  */
 export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yTreeItem> {
-  constructor(private readonly extensionUri: vscode.Uri) {}
+  constructor(private readonly extensionUri: vscode.Uri) { }
 
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
@@ -149,6 +152,7 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
         details: errorItem.detailsMessage,
         line: errorItem.range.start.line + 1,
         column: errorItem.range.start.character + 1,
+        wcagReferenceKey: errorItem.wcagReferenceKey,
       }))
     );
   }

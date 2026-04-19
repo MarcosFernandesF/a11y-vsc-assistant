@@ -231,7 +231,7 @@ function updateErrorSummaryBadge(): void {
 }
 
 /**
- * Exporta os erros de acessibilidade do arquivo ativo para um arquivo JSON em Downloads.
+ * Exporta os erros de acessibilidade do arquivo ativo para um arquivo HTML em Downloads.
  */
 async function exportAccessibilityReport(): Promise<void> {
 	if (!errorSummaryProvider) {
@@ -265,7 +265,7 @@ async function exportAccessibilityReport(): Promise<void> {
 	const downloadsDirUri = vscode.Uri.file(downloadsDir);
 	await vscode.workspace.fs.createDirectory(downloadsDirUri);
 
-	const reportFileName = buildSafeReportFileName(path.basename(document.fileName));
+	const reportFileName = buildSafeReportFileName(path.basename(document.fileName), new Date(), 'html');
 	const reportFileUri = vscode.Uri.joinPath(downloadsDirUri, reportFileName);
 
 	await vscode.workspace.fs.writeFile(reportFileUri, new TextEncoder().encode(reportText));
@@ -277,7 +277,6 @@ async function exportAccessibilityReport(): Promise<void> {
 	);
 
 	if (selectedAction === openLabel) {
-		const reportDocument = await vscode.workspace.openTextDocument(reportFileUri);
-		await vscode.window.showTextDocument(reportDocument, { preview: false });
+		await vscode.env.openExternal(reportFileUri);
 	}
 }
