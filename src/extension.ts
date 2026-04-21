@@ -56,13 +56,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(revealErrorCommand);
 	context.subscriptions.push(exportReportCommand);
 
+	void refreshWorkspaceValidation();
+
 	if (vscode.window.activeTextEditor) {
 		const doc = vscode.window.activeTextEditor.document;
 		if (isFileExtensionValid(doc)) {
 			processValidation(doc);
 		} else {
-			clearDiagnostics(doc);
-			errorSummaryProvider?.clear();
+			clearValidation(doc.uri);
 		}
 	}
 
@@ -80,8 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
 				processValidation(document);
 			}, 500);
 		} else {
-			clearDiagnostics(document);
-			errorSummaryProvider?.clear();
+			clearValidation(document.uri);
 		}
 	});
 
@@ -94,8 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if (isFileExtensionValid(document)) {
 			processValidation(document);
 		} else {
-			clearDiagnostics(document);
-			errorSummaryProvider?.clear();
+			clearValidation(document.uri);
 		}
 	});
 
@@ -122,10 +121,17 @@ export function deactivate() {
  * publica os diagnosticos no editor e registra os erros no console.
  */
 function processValidation(document: vscode.TextDocument): void {
+	const errors = collectRuleErrors(document);
+	publishValidation(document, errors);
+}
+
+/**
+ * Executa o motor de regras e retorna os erros encontrados para o documento.
+ */
+function collectRuleErrors(document: vscode.TextDocument): RuleError[] {
 	const text = document.getText();
 	const language = document.languageId;
-
-	let errors: RuleError[] = [];
+	const errors: RuleError[] = [];
 
 	if (language === 'html') {
 		errors.push(...validateImagesWithoutAlt(text));
@@ -142,6 +148,13 @@ function processValidation(document: vscode.TextDocument): void {
 		errors.push(...validateFocusVisualRemoval(text));
 	}
 
+	return errors;
+}
+
+/**
+ * Publica diagnosticos e resumo para um documento ja validado.
+ */
+function publishValidation(document: vscode.TextDocument, errors: RuleError[]): void {
 	const diagnostics = mapRuleErrorsToDiagnostics(document, errors);
 	diagnosticsCollection?.set(document.uri, diagnostics);
 	errorSummaryProvider?.setErrors(document, errors);
@@ -151,6 +164,50 @@ function processValidation(document: vscode.TextDocument): void {
 		const startPosition = document.positionAt(error.index);
 		console.log(`[Linha ${startPosition.line + 1}] ${error.message}`);
 	});
+}
+
+/**
+ * Revalida todos os arquivos HTML e CSS do workspace atual.
+ */
+async function refreshWorkspaceValidation(): Promise<void> {
+	if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+		return;
+	}
+
+	diagnosticsCollection?.clear();
+	errorSummaryProvider?.clear();
+
+	const seenDocuments = new Set<string>();
+
+	for (const openDocument of vscode.workspace.textDocuments) {
+		if (!isFileExtensionValid(openDocument)) {
+			continue;
+		}
+
+		seenDocuments.add(openDocument.uri.toString());
+		processValidation(openDocument);
+	}
+
+	const uris = await vscode.workspace.findFiles('**/*.{html,htm,css}', '**/{node_modules,.git,out}/**');
+
+	for (const uri of uris) {
+		const fileKey = uri.toString();
+
+		if (seenDocuments.has(fileKey)) {
+			continue;
+		}
+
+		try {
+			const document = await vscode.workspace.openTextDocument(uri);
+			if (isFileExtensionValid(document)) {
+				processValidation(document);
+			}
+		} catch (error) {
+			console.error(`Falha ao validar ${uri.fsPath}:`, error);
+		}
+	}
+
+	updateErrorSummaryBadge();
 }
 
 /**
@@ -201,7 +258,14 @@ function isFileExtensionValid(document: vscode.TextDocument): boolean {
  */
 function clearDiagnostics(document: vscode.TextDocument): void {
 	diagnosticsCollection?.delete(document.uri);
-	errorSummaryProvider?.clear();
+}
+
+/**
+ * Remove apenas o estado associado a um arquivo específico.
+ */
+function clearValidation(uri: vscode.Uri): void {
+	diagnosticsCollection?.delete(uri);
+	errorSummaryProvider?.clearFile(uri);
 	updateErrorSummaryBadge();
 }
 
@@ -219,13 +283,13 @@ function updateErrorSummaryBadge(): void {
 
 	if (totalErrors <= 0) {
 		errorSummaryTreeView.badge = undefined;
-		errorSummaryTreeView.message = 'Sem erros de acessibilidade no arquivo ativo.';
+		errorSummaryTreeView.message = 'Sem erros de acessibilidade nos arquivos analisados.';
 		return;
 	}
 
 	errorSummaryTreeView.badge = {
 		value: totalErrors,
-		tooltip: `${totalErrors} erro(s) de acessibilidade no arquivo ativo`,
+		tooltip: `${totalErrors} erro(s) de acessibilidade nos arquivos analisados`,
 	};
 	errorSummaryTreeView.message = undefined;
 }

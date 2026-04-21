@@ -34,7 +34,20 @@ const CATEGORY_ICON_BY_NAME: Record<string, string> = {
   'Outros Erros': 'others.svg',
 };
 
-export type A11yTreeItem = A11yErrorCategoryTreeItem | A11yErrorTreeItem;
+export type A11yTreeItem = A11yFileTreeItem | A11yErrorCategoryTreeItem | A11yErrorTreeItem;
+
+export class A11yFileTreeItem extends vscode.TreeItem {
+  constructor(
+    public readonly uri: vscode.Uri,
+    public readonly children: A11yErrorCategoryTreeItem[]
+  ) {
+    super(vscode.workspace.asRelativePath(uri, false), vscode.TreeItemCollapsibleState.Expanded);
+    this.description = `${children.reduce((total, category) => total + category.children.length, 0)} erro(s)`;
+    this.contextValue = 'a11yFile';
+    this.iconPath = new vscode.ThemeIcon('file');
+    this.tooltip = vscode.workspace.asRelativePath(uri, false);
+  }
+}
 
 export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
   constructor(
@@ -98,7 +111,7 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
-  private categoryItems: A11yErrorCategoryTreeItem[] = [];
+  private fileItems: A11yFileTreeItem[] = [];
 
   /**
    * Atualiza o estado interno do painel com os erros do documento ativo,
@@ -114,21 +127,52 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
       grouped.set(category, categoryChildren);
     }
 
-    this.categoryItems = Array.from(grouped.entries())
+    const categoryItems = Array.from(grouped.entries())
       .map(([categoryName, children]) => {
         const iconPath = this.getCategoryIconPath(categoryName);
         return new A11yErrorCategoryTreeItem(categoryName, children, iconPath);
       })
       .sort((a, b) => b.children.length - a.children.length || a.categoryName.localeCompare(b.categoryName));
 
+    if (categoryItems.length === 0) {
+      this.clearFile(document.uri);
+      return;
+    }
+
+    const nextFileItem = new A11yFileTreeItem(document.uri, categoryItems);
+    const fileKey = document.uri.toString();
+    const existingIndex = this.fileItems.findIndex(item => item.uri.toString() === fileKey);
+
+    if (existingIndex >= 0) {
+      this.fileItems.splice(existingIndex, 1, nextFileItem);
+    } else {
+      this.fileItems.push(nextFileItem);
+    }
+
+    this.fileItems.sort((a, b) => a.uri.fsPath.localeCompare(b.uri.fsPath));
+
     this.onDidChangeTreeDataEmitter.fire();
   }
 
   /**
-   * Limpa o painel de resumo e remove os erros do documento atual.
+   * Remove os erros associados a um arquivo específico.
+   */
+  clearFile(uri: vscode.Uri): void {
+    const fileKey = uri.toString();
+    const nextLength = this.fileItems.length;
+
+    this.fileItems = this.fileItems.filter(item => item.uri.toString() !== fileKey);
+
+    if (this.fileItems.length !== nextLength) {
+      this.onDidChangeTreeDataEmitter.fire();
+    }
+  }
+
+  /**
+   * Limpa o painel de resumo e remove todos os erros.
    */
   clear(): void {
-    this.categoryItems = [];
+    this.fileItems = [];
     this.onDidChangeTreeDataEmitter.fire();
   }
 
@@ -145,7 +189,11 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
    */
   getChildren(element?: A11yTreeItem): vscode.ProviderResult<A11yTreeItem[]> {
     if (!element) {
-      return this.categoryItems;
+      return this.fileItems;
+    }
+
+    if (element instanceof A11yFileTreeItem) {
+      return element.children;
     }
 
     if (element instanceof A11yErrorCategoryTreeItem) {
@@ -159,24 +207,28 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
    * Soma todos os erros atualmente exibidos no painel.
    */
   getTotalErrors(): number {
-    return this.categoryItems.reduce((total, category) => total + category.children.length, 0);
+    return this.fileItems.reduce((total, fileItem) => {
+      return total + fileItem.children.reduce((categoryTotal, category) => categoryTotal + category.children.length, 0);
+    }, 0);
   }
 
   /**
    * Converte os itens do painel em um payload pronto para exportacao.
    */
   getExportEntries(document: vscode.TextDocument): A11yPanelExportEntry[] {
-    return this.categoryItems.flatMap(categoryItem =>
-      categoryItem.children.map(errorItem => ({
-        category: categoryItem.categoryName,
-        summary: errorItem.panelSummary,
-        details: errorItem.detailsMessage,
-        line: errorItem.range.start.line + 1,
-        column: errorItem.range.start.character + 1,
-        codeSnippet: getCodeSnippet(document, errorItem.range),
-        wcagReferenceKey: errorItem.wcagReferenceKey,
-      }))
-    );
+    return this.fileItems
+      .find(item => item.uri.toString() === document.uri.toString())
+      ?.children.flatMap(categoryItem =>
+        categoryItem.children.map(errorItem => ({
+          category: categoryItem.categoryName,
+          summary: errorItem.panelSummary,
+          details: errorItem.detailsMessage,
+          line: errorItem.range.start.line + 1,
+          column: errorItem.range.start.character + 1,
+          codeSnippet: getCodeSnippet(document, errorItem.range),
+          wcagReferenceKey: errorItem.wcagReferenceKey,
+        }))
+      ) ?? [];
   }
 
   /**
