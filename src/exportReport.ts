@@ -16,6 +16,7 @@ export type A11yReportPayload = {
   totalErrors: number;
   errors: A11yErrorExportItem[];
 };
+
 /**
  * Gera o conteudo do relatorio em HTML para exportacao.
  */
