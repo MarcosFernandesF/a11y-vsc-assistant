@@ -2,6 +2,16 @@ import * as vscode from 'vscode';
 import { RuleError } from './rules/types';
 import type { WcagReferenceKey } from './rules/wcagReferences';
 
+export type A11yPanelExportEntry = {
+  category: string;
+  summary: string;
+  details: string;
+  line: number;
+  column: number;
+  codeSnippet: string;
+  wcagReferenceKey?: WcagReferenceKey;
+};
+
 const ERROR_CATEGORY_BY_REFERENCE: Record<WcagReferenceKey, string> = {
   duplicateIds: 'Erros de Estrutura',
   headersHierarchy: 'Erros de Estrutura',
@@ -45,6 +55,9 @@ export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
 export class A11yErrorTreeItem extends vscode.TreeItem {
   public readonly uri: vscode.Uri;
   public readonly range: vscode.Range;
+  public readonly detailsMessage: string;
+  public readonly panelSummary: string;
+  public readonly wcagReferenceKey?: WcagReferenceKey;
 
   constructor(document: vscode.TextDocument, error: RuleError) {
     const startPosition = document.positionAt(error.index);
@@ -56,6 +69,9 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
 
     this.uri = document.uri;
     this.range = new vscode.Range(startPosition, endPosition);
+    this.panelSummary = panelTitle;
+    this.detailsMessage = error.message;
+    this.wcagReferenceKey = error.wcagReferenceKey;
     this.description = `Linha ${startPosition.line + 1}, Coluna ${startPosition.character + 1}`;
     this.tooltip = new vscode.MarkdownString([
       `**Resumo:** ${panelTitle}`,
@@ -77,13 +93,17 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
  * Provedor de dados do TreeView para apresentar o resumo de erros.
  */
 export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yTreeItem> {
-  constructor(private readonly extensionUri: vscode.Uri) {}
+  constructor(private readonly extensionUri: vscode.Uri) { }
 
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
   private categoryItems: A11yErrorCategoryTreeItem[] = [];
 
+  /**
+   * Atualiza o estado interno do painel com os erros do documento ativo,
+   * agrupando por categoria para manter a mesma estrutura usada na exportacao.
+   */
   setErrors(document: vscode.TextDocument, errors: RuleError[]): void {
     const grouped = new Map<string, A11yErrorTreeItem[]>();
 
@@ -104,15 +124,25 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
     this.onDidChangeTreeDataEmitter.fire();
   }
 
+  /**
+   * Limpa o painel de resumo e remove os erros do documento atual.
+   */
   clear(): void {
     this.categoryItems = [];
     this.onDidChangeTreeDataEmitter.fire();
   }
 
+  /**
+   * Retorna o TreeItem associado ao elemento recebido pelo TreeView.
+   */
   getTreeItem(element: A11yTreeItem): vscode.TreeItem {
     return element;
   }
 
+  /**
+   * Resolve a hierarquia exibida no painel de resumo.
+   * Sem elemento, retorna as categorias; com categoria, retorna os erros filhos.
+   */
   getChildren(element?: A11yTreeItem): vscode.ProviderResult<A11yTreeItem[]> {
     if (!element) {
       return this.categoryItems;
@@ -125,10 +155,33 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
     return [];
   }
 
+  /**
+   * Soma todos os erros atualmente exibidos no painel.
+   */
   getTotalErrors(): number {
     return this.categoryItems.reduce((total, category) => total + category.children.length, 0);
   }
 
+  /**
+   * Converte os itens do painel em um payload pronto para exportacao.
+   */
+  getExportEntries(document: vscode.TextDocument): A11yPanelExportEntry[] {
+    return this.categoryItems.flatMap(categoryItem =>
+      categoryItem.children.map(errorItem => ({
+        category: categoryItem.categoryName,
+        summary: errorItem.panelSummary,
+        details: errorItem.detailsMessage,
+        line: errorItem.range.start.line + 1,
+        column: errorItem.range.start.character + 1,
+        codeSnippet: getCodeSnippet(document, errorItem.range),
+        wcagReferenceKey: errorItem.wcagReferenceKey,
+      }))
+    );
+  }
+
+  /**
+   * Resolve o icone da categoria com base no catalogo local de assets.
+   */
   private getCategoryIconPath(categoryName: string): vscode.Uri | vscode.ThemeIcon {
     const fileName = CATEGORY_ICON_BY_NAME[categoryName];
 
@@ -140,7 +193,7 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
   }
 }
 
-/*
+/**
  * Calcula a posicao final do range do erro com base no indice inicial e no
  * tamanho da tag, garantindo pelo menos um caractere valido para destaque.
  */
@@ -157,7 +210,7 @@ function createEndPosition(document: vscode.TextDocument, startPosition: vscode.
   return document.positionAt(endOffset);
 }
 
-/*
+/**
  * Gera um titulo curto e legivel para o painel a partir da mensagem completa,
  * removendo quebras de linha, blocos auxiliares e prefixos de lista.
  */
@@ -174,10 +227,28 @@ function extractPanelTitle(message: string): string {
   return lines[0].replace(/^-\s*/, '');
 }
 
+/**
+ * Classifica o erro em uma categoria de painel e exportacao com base na chave WCAG.
+ */
 function getErrorCategory(error: RuleError): string {
   if (error.wcagReferenceKey) {
     return ERROR_CATEGORY_BY_REFERENCE[error.wcagReferenceKey];
   }
 
   return 'Outros Erros';
+}
+
+/**
+ * Extrai um trecho legivel do codigo para ser exibido no painel e no export.
+ */
+function getCodeSnippet(document: vscode.TextDocument, range: vscode.Range): string {
+  const lineText = document.lineAt(range.start.line).text.trim();
+
+  if (lineText.length > 0) {
+    return lineText;
+  }
+
+  const snippet = document.getText(range).trim();
+
+  return snippet.length > 0 ? snippet : 'Trecho indisponivel';
 }

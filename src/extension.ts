@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as os from 'os';
+import * as path from 'path';
 import { validateImagesWithoutAlt } from './rules/imageRules';
 import { validateHeadersOrder } from './rules/headersRules';
 import { validateZoomCapability } from './rules/zoomRules';
@@ -11,6 +13,7 @@ import { validateDuplicateIds } from './rules/duplicateIdsRules';
 import { RuleError } from './rules/types';
 import { getWcagReference } from './rules/wcagReferences';
 import { A11yErrorTreeItem, A11yErrorsTreeDataProvider, A11yTreeItem } from './errorSummaryProvider';
+import { buildSafeReportFileName, formatA11yReport } from './exportReport';
 
 let timeout: NodeJS.Timeout | undefined = undefined;
 let diagnosticsCollection: vscode.DiagnosticCollection | undefined = undefined;
@@ -42,8 +45,16 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	const exportReportCommand = vscode.commands.registerCommand(
+		'a11y-vsc-assistant.exportAccessibilityReport',
+		async () => {
+			await exportAccessibilityReport();
+		}
+	);
+
 	context.subscriptions.push(errorSummaryTreeView);
 	context.subscriptions.push(revealErrorCommand);
+	context.subscriptions.push(exportReportCommand);
 
 	if (vscode.window.activeTextEditor) {
 		const doc = vscode.window.activeTextEditor.document;
@@ -217,4 +228,55 @@ function updateErrorSummaryBadge(): void {
 		tooltip: `${totalErrors} erro(s) de acessibilidade no arquivo ativo`,
 	};
 	errorSummaryTreeView.message = undefined;
+}
+
+/**
+ * Exporta os erros de acessibilidade do arquivo ativo para um arquivo HTML em Downloads.
+ */
+async function exportAccessibilityReport(): Promise<void> {
+	if (!errorSummaryProvider) {
+		vscode.window.showErrorMessage('Resumo de erros indisponivel para exportacao.');
+		return;
+	}
+
+	const activeEditor = vscode.window.activeTextEditor;
+	if (!activeEditor) {
+		vscode.window.showWarningMessage('Nenhum arquivo ativo para exportar o relatorio de acessibilidade.');
+		return;
+	}
+
+	const document = activeEditor.document;
+	if (!isFileExtensionValid(document)) {
+		vscode.window.showWarningMessage('A exportacao esta disponivel apenas para arquivos HTML e CSS.');
+		return;
+	}
+
+	processValidation(document);
+
+	const exportEntries = errorSummaryProvider.getExportEntries(document);
+	const reportText = formatA11yReport({
+		generatedAt: new Date().toISOString(),
+		sourceFile: vscode.workspace.asRelativePath(document.uri, false),
+		totalErrors: exportEntries.length,
+		errors: exportEntries,
+	});
+
+	const downloadsDir = path.join(os.homedir(), 'Downloads');
+	const downloadsDirUri = vscode.Uri.file(downloadsDir);
+	await vscode.workspace.fs.createDirectory(downloadsDirUri);
+
+	const reportFileName = buildSafeReportFileName(path.basename(document.fileName), new Date(), 'html');
+	const reportFileUri = vscode.Uri.joinPath(downloadsDirUri, reportFileName);
+
+	await vscode.workspace.fs.writeFile(reportFileUri, new TextEncoder().encode(reportText));
+
+	const openLabel = 'Abrir relatorio';
+	const selectedAction = await vscode.window.showInformationMessage(
+		`Relatorio exportado em Downloads: ${reportFileName}`,
+		openLabel
+	);
+
+	if (selectedAction === openLabel) {
+		await vscode.env.openExternal(reportFileUri);
+	}
 }
