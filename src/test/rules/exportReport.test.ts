@@ -30,23 +30,81 @@ function runExportReportTests() {
     ],
   });
 
-  assert.ok(reportText.startsWith('<!DOCTYPE html>'));
-  assert.ok(reportText.includes('<html lang="pt-BR">'));
-  assert.ok(reportText.includes('Relatorio de acessibilidade'));
-  assert.ok(reportText.includes('Problemas encontrados'));
-  assert.ok(reportText.includes('ID duplicado detectado'));
-  assert.ok(reportText.includes('Imagem sem texto alternativo'));
-  assert.ok(reportText.includes('Linha 4, coluna 5'));
-  assert.ok(reportText.includes('examples/duplicate-ids-test.html'));
+  const testCases = [
+    {
+      name: 'gera HTML base valido',
+      expected: '<!DOCTYPE html>',
+      observed: reportText.startsWith('<!DOCTYPE html>') ? '<!DOCTYPE html>' : 'saida invalida',
+    },
+    {
+      name: 'inclui lingua pt-BR',
+      expected: '<html lang="pt-BR">',
+      observed: reportText.includes('<html lang="pt-BR">') ? '<html lang="pt-BR">' : 'ausente',
+    },
+    {
+      name: 'inclui titulo do relatorio',
+      expected: 'Relatorio de acessibilidade',
+      observed: reportText.includes('Relatorio de acessibilidade') ? 'Relatorio de acessibilidade' : 'ausente',
+    },
+    {
+      name: 'inclui secao de problemas',
+      expected: 'Problemas encontrados',
+      observed: reportText.includes('Problemas encontrados') ? 'Problemas encontrados' : 'ausente',
+    },
+    {
+      name: 'inclui erro de id duplicado',
+      expected: 'ID duplicado detectado',
+      observed: reportText.includes('ID duplicado detectado') ? 'ID duplicado detectado' : 'ausente',
+    },
+    {
+      name: 'inclui erro de imagem sem alt',
+      expected: 'Imagem sem texto alternativo',
+      observed: reportText.includes('Imagem sem texto alternativo') ? 'Imagem sem texto alternativo' : 'ausente',
+    },
+    {
+      name: 'inclui local do primeiro erro',
+      expected: 'Linha 4, coluna 5',
+      observed: reportText.includes('Linha 4, coluna 5') ? 'Linha 4, coluna 5' : 'ausente',
+    },
+    {
+      name: 'inclui arquivo de origem',
+      expected: 'examples/duplicate-ids-test.html',
+      observed: reportText.includes('examples/duplicate-ids-test.html') ? 'examples/duplicate-ids-test.html' : 'ausente',
+    },
+  ];
+
+  let passedCount = 0;
+
+  testCases.forEach(testCase => {
+    try {
+      assert.strictEqual(testCase.observed, testCase.expected);
+      console.log(`OK | Caso: ${testCase.name} | esperado=${testCase.expected} encontrado=${testCase.observed}`);
+      passedCount++;
+    } catch (err) {
+      console.error(`ERRO | Caso: ${testCase.name} | esperado=${testCase.expected} encontrado=${testCase.observed}`);
+    }
+  });
 
   const reportFileName = buildSafeReportFileName('duplicate ids test.html', fixedDate, 'html');
 
-  assert.strictEqual(
-    reportFileName,
-    'a11y-report-duplicate_ids_test.html-2026-04-14T10-20-30Z.html'
-  );
+  try {
+    assert.strictEqual(
+      reportFileName,
+      'a11y-report-duplicate_ids_test.html-2026-04-14T10-20-30Z.html'
+    );
+    console.log(
+      'OK | Caso: gera nome de arquivo seguro | esperado=a11y-report-duplicate_ids_test.html-2026-04-14T10-20-30Z.html encontrado=' +
+      reportFileName
+    );
+    passedCount++;
+  } catch (err) {
+    console.error(
+      'ERRO | Caso: gera nome de arquivo seguro | esperado=a11y-report-duplicate_ids_test.html-2026-04-14T10-20-30Z.html encontrado=' +
+      reportFileName
+    );
+  }
 
-  console.log('Resultado Final: 2/2 testes passaram.\n');
+  console.log(`\nResultado Final: ${passedCount}/${testCases.length + 1} testes passaram.\n`);
 }
 
 runExportReportTests();
