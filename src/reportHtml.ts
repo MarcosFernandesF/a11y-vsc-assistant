@@ -408,6 +408,9 @@ export function createA11yReportHtml(payload: A11yReportPayload): string {
 </html>`;
 }
 
+/**
+ * Agrupa os erros por categoria para montar as secoes do relatorio.
+ */
 function groupErrorsByCategory(errors: A11yErrorExportItem[]): Array<{ category: string; errors: A11yErrorExportItem[] }> {
   const grouped = new Map<string, A11yErrorExportItem[]>();
 
@@ -420,6 +423,9 @@ function groupErrorsByCategory(errors: A11yErrorExportItem[]): Array<{ category:
   return Array.from(grouped.entries()).map(([category, categoryErrors]) => ({ category, errors: categoryErrors }));
 }
 
+/**
+ * Renderiza o card visual de um erro individual com trecho de codigo e mensagens educativas.
+ */
 function renderErrorCard(error: A11yErrorExportItem): string {
   const messageParts = parseEducationalMessage(error.details);
   const codeSnippet = escapeHtml(error.codeSnippet);
@@ -441,6 +447,9 @@ function renderErrorCard(error: A11yErrorExportItem): string {
   `;
 }
 
+/**
+ * Interpreta a mensagem educativa estruturada e separa seus blocos para o HTML final.
+ */
 function parseEducationalMessage(message: string): Array<{ label: string; text?: string; kind: 'problem' | 'impact' | 'fix' | 'reference' }> {
   const labelOrder = [
     { label: '[Problema detectado]', kind: 'problem' as const },
@@ -479,6 +488,9 @@ function parseEducationalMessage(message: string): Array<{ label: string; text?:
     : [{ label: '[Detalhes]', text: message, kind: 'problem' }];
 }
 
+/**
+ * Renderiza uma secao de mensagem do relatorio, escolhendo o layout correto por tipo.
+ */
 function renderMessageSection(
   section: { label: string; text?: string; kind: 'problem' | 'impact' | 'fix' | 'reference' },
   wcagReferenceKey?: A11yErrorExportItem['wcagReferenceKey']
@@ -495,6 +507,9 @@ function renderMessageSection(
   `;
 }
 
+/**
+ * Renderiza a secao de referencia WCAG, com link oficial quando a chave existir.
+ */
 function renderReferenceSection(label: string, wcagReferenceKey?: A11yErrorExportItem['wcagReferenceKey']): string {
   if (!wcagReferenceKey) {
     return `
@@ -528,6 +543,9 @@ function renderReferenceSection(label: string, wcagReferenceKey?: A11yErrorExpor
   `;
 }
 
+/**
+ * Converte o timestamp ISO em texto legivel para o usuario final.
+ */
 function formatDateTime(isoValue: string): string {
   const date = new Date(isoValue);
 
@@ -541,6 +559,9 @@ function formatDateTime(isoValue: string): string {
   }).format(date);
 }
 
+/**
+ * Escapa caracteres especiais para evitar que o conteudo do relatorio quebre o HTML.
+ */
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
