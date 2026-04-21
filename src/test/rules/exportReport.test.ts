@@ -17,6 +17,7 @@ function runExportReportTests() {
         details: 'Dois elementos compartilham o mesmo ID.',
         line: 4,
         column: 5,
+        codeSnippet: '<div id="duplicado"></div>',
       },
       {
         category: 'Erros de Conteudo',
@@ -24,6 +25,7 @@ function runExportReportTests() {
         details: 'A imagem deve possuir atributo alt.',
         line: 12,
         column: 3,
+        codeSnippet: '<img src="imagem.png">',
       },
     ],
   });
