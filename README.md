@@ -4,7 +4,7 @@ Extensão para análise proativa de acessibilidade em arquivos HTML e CSS no VS 
 
 ## Visão Geral
 
-O motor da extensão funciona sobre o documento ativo e aplica um conjunto de regras educacionais de acessibilidade. Quando uma regra é violada, a extensão publica um diagnostic no editor, mostra a explicação do problema e associa a ocorrência a uma referência WCAG 2.2.
+O motor da extensão funciona sobre o documento ativo e aplica um conjunto de regras educacionais de acessibilidade. Quando encontra um problema, a extensão destaca o trecho no arquivo, mostra uma explicação simples e associa a ocorrência a uma referência WCAG 2.2.
 
 Principais capacidades:
 
@@ -41,7 +41,7 @@ Principais capacidades:
 1. Abra um arquivo HTML ou CSS no editor.
 2. Faça alterações no conteúdo.
 3. A extensão revalida o documento automaticamente com pequeno atraso para evitar excesso de processamento.
-4. Os alertas aparecem no editor e também no painel `Problems` do VS Code.
+4. Os alertas aparecem no editor e também na lista de problemas do VS Code.
 5. Clique no ícone `A11y Assistant` na barra lateral para ver o resumo de erros.
 6. Selecione um item do painel para ir direto ao trecho problemático.
 7. Use o comando de exportação para gerar o relatório HTML na pasta Downloads.
@@ -215,8 +215,8 @@ p {
 ## Funcionamento Técnico em Alto Nível
 
 - A extensão observa as alterações no editor e valida HTML e CSS de forma incremental.
-- Os problemas encontrados são convertidos em diagnostics do VS Code.
-- O painel lateral usa uma árvore de dados para agrupar os erros por categoria.
+- Os problemas encontrados viram avisos no VS Code.
+- O painel lateral organiza os problemas por categoria para facilitar a leitura.
 - O relatório exportado reutiliza o mesmo conjunto de erros para manter consistência entre editor, painel e arquivo gerado.
 
 ## Status e Notas
