@@ -1,71 +1,230 @@
-# a11y-vsc-assistant README
+# A11y VSCode Assistant
 
-This is the README for your extension "a11y-vsc-assistant". After writing up a brief description, we recommend including the following sections.
+Extensão para análise proativa de acessibilidade em arquivos HTML e CSS no VS Code. Ela valida o conteúdo em tempo real, destaca problemas no editor, organiza os achados em um painel lateral e exporta um relatório HTML.
 
-## Features
+## Visão Geral
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+O motor da extensão funciona sobre o documento ativo e aplica um conjunto de regras educacionais de acessibilidade. Quando uma regra é violada, a extensão publica um diagnostic no editor, mostra a explicação do problema e associa a ocorrência a uma referência WCAG 2.2.
 
-For example if there is an image subfolder under your extension project workspace:
+Principais capacidades:
 
-\!\[feature X\]\(images/feature-x.png\)
+- Validação automática enquanto você digita em arquivos HTML e CSS.
+- Painel lateral com resumo categorizado dos problemas.
+- Navegação direta do painel para o ponto exato do código.
+- Exportação do resumo para um arquivo HTML em Downloads.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Requisitos
 
-## Requirements
+- VS Code `^1.110.0`.
+- Arquivos em HTML ou CSS para que as regras sejam executadas.
+- Sistema com pasta Downloads acessível para a exportação do relatório.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Instalação
 
-## Extension Settings
+### Via Marketplace
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1. Abra a aba de extensões do VS Code.
+2. Pesquise por `A11y VSCode Assistant`.
+3. Instale a extensão publicada por `MarcosFernandesF`.
+4. Abra um arquivo `.html` ou `.css` para iniciar a análise.
 
-For example:
+### Via arquivo `.vsix`
 
-This extension contributes the following settings:
+1. No VS Code, abra `Extensions`.
+2. Clique no menu `...` da área de extensões.
+3. Selecione `Install from VSIX...`.
+4. Escolha o arquivo `.vsix` da extensão.
+5. Reabra ou edite um arquivo `.html` ou `.css` para acionar as validações.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Como Usar
 
-## Known Issues
+1. Abra um arquivo HTML ou CSS no editor.
+2. Faça alterações no conteúdo.
+3. A extensão revalida o documento automaticamente com pequeno atraso para evitar excesso de processamento.
+4. Os alertas aparecem no editor e também no painel `Problems` do VS Code.
+5. Clique no ícone `A11y Assistant` na barra lateral para ver o resumo de erros.
+6. Selecione um item do painel para ir direto ao trecho problemático.
+7. Use o comando de exportação para gerar o relatório HTML na pasta Downloads.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+## Painel de Resumo e Exportação
 
-## Release Notes
+O painel lateral `Resumo de Erros` fica dentro da visão `A11y Assistant` na Activity Bar.
 
-Users appreciate release notes as you update your extension.
+- O número total de erros ativos aparece no cabeçalho do painel.
+- Os problemas são agrupados por categoria para facilitar leitura e priorização.
+- Cada item do painel mostra linha, coluna e um texto resumido do alerta.
+- Ao clicar em um item, o editor é aberto na posição correspondente do erro.
 
-### 1.0.0
+Para exportar o resultado:
 
-Initial release of ...
+1. Abra um arquivo HTML ou CSS com alertas ou sem alertas.
+2. Clique no botão de download no topo do painel `Resumo de Erros` ou execute o comando `A11y: Baixar relatório de acessibilidade`.
+3. O relatório é salvo automaticamente em `Downloads` com nome seguro baseado no arquivo atual.
+4. Se desejar, use a opção `Abrir relatorio` exibida após a exportação.
 
-### 1.0.1
+## Motor de Regras
 
-Fixed issue #.
+A extensão usa regras específicas para cada tipo de arquivo:
 
-### 1.1.0
+- HTML: `img` sem `alt`, hierarquia de títulos, viewport bloqueando zoom, elementos clicáveis não interativos, remoção de foco visual inline, idioma da página e IDs duplicados.
+- CSS: texto justificado e remoção de foco visual sem alternativa perceptível.
 
-Added features X, Y, and Z.
+Cada alerta traz uma mensagem educacional e uma referência WCAG 2.2 associada, para apoiar correção rápida e também aprendizado.
 
----
+## Exemplos de Uso e Regras
 
-## Following extension guidelines
+Os exemplos abaixo mostram o que dispara cada alerta e como corrigir o problema.
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+### 1. Imagem Sem `alt`
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+Antes:
 
-## Working with Markdown
+```html
+<img src="banner.png">
+```
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+Depois:
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+```html
+<img src="banner.png" alt="Banner promocional da campanha de inverno">
+```
 
-## For more information
+### 2. Hierarquia de Títulos Fora de Ordem
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+Antes:
 
-**Enjoy!**
+```html
+<h1>Produto</h1>
+<h3>Detalhes técnicos</h3>
+```
+
+Depois:
+
+```html
+<h1>Produto</h1>
+<h2>Detalhes técnicos</h2>
+```
+
+### 3. Viewport Bloqueando Zoom
+
+Antes:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+```
+
+Depois:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1">
+```
+
+### 4. Elemento Não Interativo com Clique
+
+Antes:
+
+```html
+<div onclick="abrirMenu()">Abrir menu</div>
+```
+
+Depois:
+
+```html
+<button type="button" onclick="abrirMenu()">Abrir menu</button>
+```
+
+### 5. Remoção de Foco Visual em HTML e CSS
+
+Antes em HTML:
+
+```html
+<a href="/contato" style="outline: none;">Contato</a>
+```
+
+Depois em HTML:
+
+```html
+<a href="/contato" class="link-focus">Contato</a>
+```
+
+Antes em CSS:
+
+```css
+.link-focus {
+	outline: none;
+}
+```
+
+Depois em CSS:
+
+```css
+.link-focus:focus-visible {
+	outline: 3px solid #1d4ed8;
+	outline-offset: 2px;
+}
+```
+
+### 6. Idioma da Página Não Declarado
+
+Antes:
+
+```html
+<html>
+```
+
+Depois:
+
+```html
+<html lang="pt-BR">
+```
+
+### 7. IDs Duplicados
+
+Antes:
+
+```html
+<section id="hero">...</section>
+<div id="hero">...</div>
+```
+
+Depois:
+
+```html
+<section id="hero">...</section>
+<div id="hero-secondary">...</div>
+```
+
+### 8. Texto Justificado
+
+Antes:
+
+```css
+p {
+	text-align: justify;
+}
+```
+
+Depois:
+
+```css
+p {
+	text-align: left;
+}
+```
+
+## Funcionamento Técnico em Alto Nível
+
+- A extensão observa as alterações no editor e valida HTML e CSS de forma incremental.
+- Os problemas encontrados são convertidos em diagnostics do VS Code.
+- O painel lateral usa uma árvore de dados para agrupar os erros por categoria.
+- O relatório exportado reutiliza o mesmo conjunto de erros para manter consistência entre editor, painel e arquivo gerado.
+
+## Status e Notas
+
+- A documentação desta versão foca no uso local e no fluxo de análise dentro do VS Code.
+- Não há configurações personalizadas expostas no momento.
+- O relatório é gerado em formato HTML e salvo em Downloads.
+
+## Licença e Contribuição
+
+Este projeto segue as diretrizes internas do repositório. Se você for adicionar novas regras, mantenha a documentação sincronizada com o comportamento do motor e com os comandos expostos pela extensão.
