@@ -50,10 +50,6 @@
     },
     "commands": [
       {
-        "command": "a11y-vsc-assistant.revealErrorFromPanel",
-        "title": "A11y: Ir para Erro no Código"
-      },
-      {
         "command": "a11y-vsc-assistant.exportAccessibilityReport",
         "title": "A11y: Baixar relatório de acessibilidade",
         "icon": {
