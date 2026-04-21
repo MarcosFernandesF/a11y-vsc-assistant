@@ -55,12 +55,17 @@ O painel lateral `Resumo de Erros` fica dentro da visão `A11y Assistant` na Act
 - Cada item do painel mostra linha, coluna e um texto resumido do alerta.
 - Ao clicar em um item, o editor é aberto na posição correspondente do erro.
 
+![Painel lateral com os erros agrupados](media/screenshots/sidebar-errors.png)
+
 Para exportar o resultado:
 
 1. Abra um arquivo HTML ou CSS com alertas ou sem alertas.
 2. Clique no botão de download no topo do painel `Resumo de Erros` ou execute o comando `A11y: Baixar relatório de acessibilidade`.
 3. O relatório é salvo automaticamente em `Downloads` com nome seguro baseado no arquivo atual.
 4. Se desejar, use a opção `Abrir relatorio` exibida após a exportação.
+
+![Botão de exportação do relatório](media/screenshots/export-button.png)
+![Exemplo do relatório exportado](media/screenshots/exported-report.png)
 
 ## Motor de Regras
 
@@ -163,6 +168,8 @@ Depois em CSS:
 	outline-offset: 2px;
 }
 ```
+
+![Erro destacado no código](media/screenshots/underlined-error.png)
 
 ### 6. Idioma da Página Não Declarado
 
