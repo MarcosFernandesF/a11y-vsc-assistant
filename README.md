@@ -4,12 +4,13 @@ Extensão para análise proativa de acessibilidade em arquivos HTML e CSS no VS 
 
 ## Visão Geral
 
-O motor da extensão funciona sobre o documento ativo e aplica um conjunto de regras educacionais de acessibilidade. Quando encontra um problema, a extensão destaca o trecho no arquivo, mostra uma explicação simples e associa a ocorrência a uma referência WCAG 2.2.
+O motor da extensão funciona sobre todos os arquivos HTML e CSS encontrados no workspace e aplica um conjunto de regras educacionais de acessibilidade. Quando encontra um problema, a extensão destaca o trecho no arquivo, mostra uma explicação simples e associa a ocorrência a uma referência WCAG 2.2.
 
 Principais capacidades:
 
 - Validação automática enquanto você digita em arquivos HTML e CSS.
-- Painel lateral com resumo categorizado dos problemas.
+- Varredura inicial do workspace para listar erros de todos os arquivos compatíveis.
+- Painel lateral com hierarquia por arquivo, categoria e erro.
 - Navegação direta do painel para o ponto exato do código.
 - Exportação do resumo para um arquivo HTML em Downloads.
 
@@ -38,20 +39,20 @@ Principais capacidades:
 
 ## Como Usar
 
-1. Abra um arquivo HTML ou CSS no editor.
-2. Faça alterações no conteúdo.
-3. A extensão revalida o documento automaticamente com pequeno atraso para evitar excesso de processamento.
+1. Abra um workspace com arquivos HTML ou CSS.
+2. A extensão faz uma varredura inicial e monta o painel por arquivo.
+3. Faça alterações em qualquer arquivo compatível para revalidar automaticamente o documento alterado.
 4. Os alertas aparecem no editor e também na lista de problemas do VS Code.
-5. Clique no ícone `A11y Assistant` na barra lateral para ver o resumo de erros.
-6. Selecione um item do painel para ir direto ao trecho problemático.
-7. Use o comando de exportação para gerar o relatório HTML na pasta Downloads.
+5. Clique no ícone `A11y Assistant` na barra lateral para ver os arquivos com erros.
+6. Expanda um arquivo para ver as categorias e depois os erros individuais.
+7. Use o comando de exportação para gerar o relatório HTML da aba atual na pasta Downloads.
 
 ## Painel de Resumo e Exportação
 
 O painel lateral `Resumo de Erros` fica dentro da visão `A11y Assistant` na Activity Bar.
 
-- O número total de erros ativos aparece no cabeçalho do painel.
-- Os problemas são agrupados por categoria para facilitar leitura e priorização.
+- O número total de erros encontrados no workspace aparece no cabeçalho do painel.
+- Os problemas são agrupados por arquivo, depois por categoria, para facilitar leitura e priorização.
 - Cada item do painel mostra linha, coluna e um texto resumido do alerta.
 - Ao clicar em um item, o editor é aberto na posição correspondente do erro.
 
