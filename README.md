@@ -219,18 +219,12 @@ p {
 }
 ```
 
-## Funcionamento Técnico em Alto Nível
+## Funcionamento Técnico
 
 - A extensão observa as alterações no editor e valida HTML e CSS de forma incremental.
 - Os problemas encontrados viram avisos no VS Code.
 - O painel lateral organiza os problemas por categoria para facilitar a leitura.
 - O relatório exportado reutiliza o mesmo conjunto de erros para manter consistência entre editor, painel e arquivo gerado.
-
-## Status e Notas
-
-- A documentação desta versão foca no uso local e no fluxo de análise dentro do VS Code.
-- Não há configurações personalizadas expostas no momento.
-- O relatório é gerado em formato HTML e salvo em Downloads.
 
 ## Licença e Contribuição
 
