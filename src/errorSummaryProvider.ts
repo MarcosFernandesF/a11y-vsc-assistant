@@ -222,6 +222,11 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
     );
   }
 
+  /** Retorna as URIs dos arquivos que contém erros no resumo */
+  getFileUris(): vscode.Uri[] {
+    return Array.from(this.fileCategoryMap.keys()).map(k => vscode.Uri.parse(k));
+  }
+
   private rebuildFileItems(): void {
     this.fileItems = Array.from(this.fileCategoryMap.entries()).map(([uriString, categories]) => {
       const uri = vscode.Uri.parse(uriString);

@@ -52,9 +52,72 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	const exportFileCommand = vscode.commands.registerCommand(
+		'a11y-vsc-assistant.exportAccessibilityReportForFile',
+		async (itemOrUri: any) => {
+			try {
+				let uri: vscode.Uri | undefined;
+				if (itemOrUri && itemOrUri.uri instanceof vscode.Uri) {
+					uri = itemOrUri.uri as vscode.Uri;
+				} else if (itemOrUri instanceof vscode.Uri) {
+					uri = itemOrUri;
+				}
+
+				if (!uri) {
+					vscode.window.showWarningMessage('Arquivo inválido para exportacao.');
+					return;
+				}
+
+				const document = await vscode.workspace.openTextDocument(uri);
+				if (!isFileExtensionValid(document)) {
+					vscode.window.showWarningMessage('A exportacao esta disponivel apenas para arquivos HTML e CSS.');
+					return;
+				}
+
+				processValidation(document);
+				const exportEntries = errorSummaryProvider?.getExportEntries(document) ?? [];
+				await writeReportForDocument(document, exportEntries);
+				vscode.window.showInformationMessage(`Relatorio exportado: ${path.basename(document.fileName)}`);
+			} catch (err) {
+				console.error('Erro ao exportar relatorio do arquivo', err);
+			}
+		}
+	);
+
+	const exportAllCommand = vscode.commands.registerCommand(
+		'a11y-vsc-assistant.exportAllAccessibilityReports',
+		async () => {
+			if (!errorSummaryProvider) {
+				vscode.window.showErrorMessage('Resumo de erros indisponivel para exportacao.');
+				return;
+			}
+
+			const uris = errorSummaryProvider.getFileUris();
+			if (uris.length === 0) {
+				vscode.window.showInformationMessage('Nenhum erro encontrado para exportacao.');
+				return;
+			}
+
+			for (const uri of uris) {
+				try {
+					const doc = await vscode.workspace.openTextDocument(uri);
+					processValidation(doc);
+					const entries = errorSummaryProvider.getExportEntries(doc);
+					await writeReportForDocument(doc, entries);
+				} catch (err) {
+					console.error('Erro exportando relatorio para', uri.toString(), err);
+				}
+			}
+
+			vscode.window.showInformationMessage('Exportacao de relatorios concluida.');
+		}
+	);
+
 	context.subscriptions.push(errorSummaryTreeView);
 	context.subscriptions.push(revealErrorCommand);
 	context.subscriptions.push(exportReportCommand);
+	context.subscriptions.push(exportFileCommand);
+	context.subscriptions.push(exportAllCommand);
 
 	if (vscode.window.activeTextEditor) {
 		const doc = vscode.window.activeTextEditor.document;
@@ -313,4 +376,22 @@ async function exportAccessibilityReport(): Promise<void> {
 	if (selectedAction === openLabel) {
 		await vscode.env.openExternal(reportFileUri);
 	}
+}
+
+async function writeReportForDocument(document: vscode.TextDocument, exportEntries: any[]): Promise<void> {
+	const reportText = formatA11yReport({
+		generatedAt: new Date().toISOString(),
+		sourceFile: vscode.workspace.asRelativePath(document.uri, false),
+		totalErrors: exportEntries.length,
+		errors: exportEntries,
+	});
+
+	const downloadsDir = path.join(os.homedir(), 'Downloads');
+	const downloadsDirUri = vscode.Uri.file(downloadsDir);
+	await vscode.workspace.fs.createDirectory(downloadsDirUri);
+
+	const reportFileName = buildSafeReportFileName(path.basename(document.fileName), new Date(), 'html');
+	const reportFileUri = vscode.Uri.joinPath(downloadsDirUri, reportFileName);
+
+	await vscode.workspace.fs.writeFile(reportFileUri, new TextEncoder().encode(reportText));
 }
