@@ -34,7 +34,21 @@ const CATEGORY_ICON_BY_NAME: Record<string, string> = {
   'Outros Erros': 'others.svg',
 };
 
-export type A11yTreeItem = A11yErrorCategoryTreeItem | A11yErrorTreeItem;
+export type A11yTreeItem = A11yFileTreeItem | A11yErrorCategoryTreeItem | A11yErrorTreeItem;
+
+export class A11yFileTreeItem extends vscode.TreeItem {
+  public readonly uri: vscode.Uri;
+  public readonly children: A11yErrorCategoryTreeItem[];
+
+  constructor(uri: vscode.Uri, fileName: string, children: A11yErrorCategoryTreeItem[], icon?: vscode.ThemeIcon) {
+    super(fileName, vscode.TreeItemCollapsibleState.Collapsed);
+    this.uri = uri;
+    this.children = children;
+    this.description = `${children.reduce((s, c) => s + c.children.length, 0)} erro(s)`;
+    this.contextValue = 'a11yFile';
+    this.iconPath = icon ?? new vscode.ThemeIcon('file');
+  }
+}
 
 export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
   constructor(
@@ -98,7 +112,9 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
-  private categoryItems: A11yErrorCategoryTreeItem[] = [];
+  // Map from document URI string to its category items
+  private fileCategoryMap: Map<string, A11yErrorCategoryTreeItem[]> = new Map();
+  private fileItems: A11yFileTreeItem[] = [];
 
   /**
    * Atualiza o estado interno do painel com os erros do documento ativo,
@@ -114,13 +130,27 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
       grouped.set(category, categoryChildren);
     }
 
-    this.categoryItems = Array.from(grouped.entries())
+    const categoryItems = Array.from(grouped.entries())
       .map(([categoryName, children]) => {
         const iconPath = this.getCategoryIconPath(categoryName);
         return new A11yErrorCategoryTreeItem(categoryName, children, iconPath);
       })
       .sort((a, b) => b.children.length - a.children.length || a.categoryName.localeCompare(b.categoryName));
 
+    const key = document.uri.toString();
+    if (categoryItems.length === 0) {
+      this.fileCategoryMap.delete(key);
+    } else {
+      this.fileCategoryMap.set(key, categoryItems);
+    }
+
+    this.rebuildFileItems();
+    this.onDidChangeTreeDataEmitter.fire();
+  }
+
+  removeErrorsForDocument(document: vscode.TextDocument): void {
+    this.fileCategoryMap.delete(document.uri.toString());
+    this.rebuildFileItems();
     this.onDidChangeTreeDataEmitter.fire();
   }
 
@@ -128,7 +158,8 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
    * Limpa o painel de resumo e remove os erros do documento atual.
    */
   clear(): void {
-    this.categoryItems = [];
+    this.fileCategoryMap.clear();
+    this.fileItems = [];
     this.onDidChangeTreeDataEmitter.fire();
   }
 
@@ -145,7 +176,11 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
    */
   getChildren(element?: A11yTreeItem): vscode.ProviderResult<A11yTreeItem[]> {
     if (!element) {
-      return this.categoryItems;
+      return this.fileItems;
+    }
+
+    if (element instanceof A11yFileTreeItem) {
+      return element.children;
     }
 
     if (element instanceof A11yErrorCategoryTreeItem) {
@@ -159,14 +194,22 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
    * Soma todos os erros atualmente exibidos no painel.
    */
   getTotalErrors(): number {
-    return this.categoryItems.reduce((total, category) => total + category.children.length, 0);
+    let total = 0;
+    for (const categories of this.fileCategoryMap.values()) {
+      for (const cat of categories) {
+        total += cat.children.length;
+      }
+    }
+    return total;
   }
 
   /**
    * Converte os itens do painel em um payload pronto para exportacao.
    */
   getExportEntries(document: vscode.TextDocument): A11yPanelExportEntry[] {
-    return this.categoryItems.flatMap(categoryItem =>
+    const key = document.uri.toString();
+    const categories = this.fileCategoryMap.get(key) ?? [];
+    return categories.flatMap(categoryItem =>
       categoryItem.children.map(errorItem => ({
         category: categoryItem.categoryName,
         summary: errorItem.panelSummary,
@@ -177,6 +220,14 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
         wcagReferenceKey: errorItem.wcagReferenceKey,
       }))
     );
+  }
+
+  private rebuildFileItems(): void {
+    this.fileItems = Array.from(this.fileCategoryMap.entries()).map(([uriString, categories]) => {
+      const uri = vscode.Uri.parse(uriString);
+      const fileName = vscode.workspace.asRelativePath(uri, false);
+      return new A11yFileTreeItem(uri, fileName, categories);
+    }).sort((a, b) => a.label!.toString().localeCompare(b.label!.toString()));
   }
 
   /**

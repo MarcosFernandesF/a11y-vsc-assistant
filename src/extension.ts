@@ -62,7 +62,6 @@ export function activate(context: vscode.ExtensionContext) {
 			processValidation(doc);
 		} else {
 			clearDiagnostics(doc);
-			errorSummaryProvider?.clear();
 		}
 	}
 
@@ -85,7 +84,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}, 500);
 		} else {
 			clearDiagnostics(document);
-			errorSummaryProvider?.clear();
 		}
 	});
 
@@ -99,7 +97,6 @@ export function activate(context: vscode.ExtensionContext) {
 			processValidation(document);
 		} else {
 			clearDiagnostics(document);
-			errorSummaryProvider?.clear();
 		}
 	});
 
@@ -238,7 +235,7 @@ async function scanWorkspaceAndValidateAll(): Promise<void> {
  */
 function clearDiagnostics(document: vscode.TextDocument): void {
 	diagnosticsCollection?.delete(document.uri);
-	errorSummaryProvider?.clear();
+	errorSummaryProvider?.removeErrorsForDocument(document);
 	updateErrorSummaryBadge();
 }
 
@@ -256,13 +253,13 @@ function updateErrorSummaryBadge(): void {
 
 	if (totalErrors <= 0) {
 		errorSummaryTreeView.badge = undefined;
-		errorSummaryTreeView.message = 'Sem erros de acessibilidade no arquivo ativo.';
+		errorSummaryTreeView.message = 'Sem erros de acessibilidade no workspace.';
 		return;
 	}
 
 	errorSummaryTreeView.badge = {
 		value: totalErrors,
-		tooltip: `${totalErrors} erro(s) de acessibilidade no arquivo ativo`,
+		tooltip: `${totalErrors} erro(s) de acessibilidade no workspace`,
 	};
 	errorSummaryTreeView.message = undefined;
 }
