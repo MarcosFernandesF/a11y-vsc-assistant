@@ -68,6 +68,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	updateErrorSummaryBadge();
 
+	// Varre o workspace e valida todos os arquivos HTML/CSS ao ativar a extensao
+	// (nao bloqueia a ativacao principal)
+	scanWorkspaceAndValidateAll();
+
 	const documentChangeEvent = vscode.workspace.onDidChangeTextDocument(event => {
 		const document = event.document;
 
@@ -194,6 +198,39 @@ function mapRuleErrorsToDiagnostics(document: vscode.TextDocument, errors: RuleE
  */
 function isFileExtensionValid(document: vscode.TextDocument): boolean {
 	return document.languageId === 'html' || document.languageId === 'css';
+}
+
+/**
+ * Varre o workspace procurando por arquivos HTML e CSS e valida cada um.
+ */
+async function scanWorkspaceAndValidateAll(): Promise<void> {
+	if (!vscode.workspace.workspaceFolders) {
+		return;
+	}
+
+	try {
+		const htmlFiles = await vscode.workspace.findFiles('**/*.html', '**/node_modules/**');
+		const cssFiles = await vscode.workspace.findFiles('**/*.css', '**/node_modules/**');
+
+		const uris = [...htmlFiles, ...cssFiles];
+
+		const CONCURRENCY = 20;
+		for (let i = 0; i < uris.length; i += CONCURRENCY) {
+			const batch = uris.slice(i, i + CONCURRENCY);
+			await Promise.all(batch.map(async (uri) => {
+				try {
+					const document = await vscode.workspace.openTextDocument(uri);
+					if (isFileExtensionValid(document)) {
+						processValidation(document);
+					}
+				} catch (err) {
+					console.error('Erro ao abrir documento para validacao', uri.toString(), err);
+				}
+			}));
+		}
+	} catch (err) {
+		console.error('Erro ao varrer workspace para arquivos HTML/CSS', err);
+	}
 }
 
 /**
