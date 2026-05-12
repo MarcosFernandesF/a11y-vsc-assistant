@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
 import { zoomMaximumScaleMessage, zoomUserScalableMessage } from "./educationMessages";
 
@@ -122,3 +122,9 @@ export function validateZoomCapability(text: string): RuleError[] {
 
   return errors;
 }
+
+export const zoomCapabilityRule: A11yRule = {
+  id: "zoom-capability",
+  languages: ["html"],
+  evaluate: (text) => validateZoomCapability(text),
+};

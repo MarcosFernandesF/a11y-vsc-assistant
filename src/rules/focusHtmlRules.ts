@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
 import { focusVisualRemovalHtmlMessage } from "./educationMessages";
 
@@ -109,3 +109,9 @@ export function validateHtmlFocusVisible(text: string): RuleError[] {
 
   return errors;
 }
+
+export const focusHtmlRule: A11yRule = {
+  id: "focus-visual-removal-html",
+  languages: ["html"],
+  evaluate: (text) => validateHtmlFocusVisible(text),
+};

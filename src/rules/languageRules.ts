@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
 import { missingPageLanguageMessage } from "./educationMessages";
 
@@ -32,3 +32,9 @@ export function validatePageLanguage(text: string): RuleError[] {
 
   return errors;
 }
+
+export const pageLanguageRule: A11yRule = {
+  id: "page-language",
+  languages: ["html"],
+  evaluate: (text) => validatePageLanguage(text),
+};

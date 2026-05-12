@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { justifyTextMessage } from "./educationMessages";
 
 /**
@@ -24,3 +24,9 @@ export function validateJustifiedCss(text: string): RuleError[] {
 
   return errors;
 }
+
+export const justifyTextRule: A11yRule = {
+  id: "justify-text",
+  languages: ["css"],
+  evaluate: (text) => validateJustifiedCss(text),
+};

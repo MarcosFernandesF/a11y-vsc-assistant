@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateImagesWithoutAlt } from '../../rules/imageRules';
-import { TestCase } from './testTypes';
+import { imageAltRule } from '../../rules/imageRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runImageTests() {
     console.log("Iniciando Testes Unitarios: Regras de Acessibilidade de Imagem...");
@@ -20,7 +20,7 @@ function runImageTests() {
     let passedCount = 0;
 
     testCases.forEach(testCase => {
-        const results = validateImagesWithoutAlt(testCase.html);
+        const results = imageAltRule.evaluate(testCase.html, buildRuleContext('html'));
         const observed = results.length;
         try {
             assert.strictEqual(observed, testCase.expected);

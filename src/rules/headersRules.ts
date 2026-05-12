@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import {
   headersDecreasingOrderMessage,
   headersHierarchySkipMessage,
@@ -67,3 +67,9 @@ export function validateHeadersOrder(text: string): RuleError[] {
 
   return errors;
 }
+
+export const headersHierarchyRule: A11yRule = {
+  id: "headers-hierarchy",
+  languages: ["html"],
+  evaluate: (text) => validateHeadersOrder(text),
+};

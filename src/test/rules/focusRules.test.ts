@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateFocusVisualRemoval } from '../../rules/focusRules';
-import { TestCase } from './testTypes';
+import { focusVisualRemovalCssRule } from '../../rules/focusRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runFocusRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de Remocao de Foco Visual...');
@@ -59,7 +59,7 @@ function runFocusRuleTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validateFocusVisualRemoval(testCase.html);
+    const results = focusVisualRemovalCssRule.evaluate(testCase.html, buildRuleContext('css'));
     const observed = results.length;
 
     try {

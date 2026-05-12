@@ -1,16 +1,9 @@
 import * as vscode from 'vscode';
 import * as os from 'os';
 import * as path from 'path';
-import { validateImagesWithoutAlt } from './rules/imageRules';
-import { validateHeadersOrder } from './rules/headersRules';
-import { validateZoomCapability } from './rules/zoomRules';
-import { validateJustifiedCss } from './rules/justifyRules';
-import { validateNonInteractiveClickableElements } from './rules/nonInteractiveClickableRules';
-import { validateFocusVisualRemoval } from './rules/focusRules';
-import { validateHtmlFocusVisible } from './rules/focusHtmlRules';
-import { validatePageLanguage } from './rules/languageRules';
-import { validateDuplicateIds } from './rules/duplicateIdsRules';
-import { RuleError } from './rules/types';
+import { RuleEngine } from './rules/engine';
+import { allRules } from './rules/registry';
+import { RuleError, RuleLanguage } from './rules/types';
 import { getWcagReference } from './rules/wcagReferences';
 import { A11yErrorTreeItem, A11yErrorsTreeDataProvider, A11yTreeItem } from './errorSummaryProvider';
 import { buildSafeReportFileName, formatA11yReport } from './exportReport';
@@ -19,6 +12,7 @@ let timeout: NodeJS.Timeout | undefined = undefined;
 let diagnosticsCollection: vscode.DiagnosticCollection | undefined = undefined;
 let errorSummaryProvider: A11yErrorsTreeDataProvider | undefined = undefined;
 let errorSummaryTreeView: vscode.TreeView<A11yTreeItem> | undefined = undefined;
+const ruleEngine = new RuleEngine(allRules);
 
 /**
  * Inicializa a extensao, registra a collection de diagnosticos e configura
@@ -188,23 +182,15 @@ export function deactivate() {
 function processValidation(document: vscode.TextDocument): void {
 	const text = document.getText();
 	const language = document.languageId;
-
-	let errors: RuleError[] = [];
-
-	if (language === 'html') {
-		errors.push(...validateImagesWithoutAlt(text));
-		errors.push(...validateHeadersOrder(text));
-		errors.push(...validateZoomCapability(text));
-		errors.push(...validateNonInteractiveClickableElements(text));
-		errors.push(...validateHtmlFocusVisible(text));
-		errors.push(...validatePageLanguage(text));
-		errors.push(...validateDuplicateIds(text));
+	if (!isSupportedLanguage(language)) {
+		return;
 	}
 
-	if (language === 'css') {
-		errors.push(...validateJustifiedCss(text));
-		errors.push(...validateFocusVisualRemoval(text));
-	}
+	const errors: RuleError[] = ruleEngine.run(text, {
+		languageId: language,
+		uri: document.uri.toString(),
+		fileName: document.fileName,
+	});
 
 	const diagnostics = mapRuleErrorsToDiagnostics(document, errors);
 	diagnosticsCollection?.set(document.uri, diagnostics);
@@ -257,7 +243,11 @@ function mapRuleErrorsToDiagnostics(document: vscode.TextDocument, errors: RuleE
  * Verifica se o documento e de uma linguagem suportada pelo motor de regras.
  */
 function isFileExtensionValid(document: vscode.TextDocument): boolean {
-	return document.languageId === 'html' || document.languageId === 'css';
+	return isSupportedLanguage(document.languageId);
+}
+
+function isSupportedLanguage(languageId: string): languageId is RuleLanguage {
+	return languageId === 'html' || languageId === 'css';
 }
 
 /**

@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { focusVisualRemovalCssMessage } from "./educationMessages";
 
 // Divide o CSS em blocos "seletor { declaracoes }" para avaliacao por contexto.
@@ -74,3 +74,9 @@ export function validateFocusVisualRemoval(text: string): RuleError[] {
 
   return errors;
 }
+
+export const focusVisualRemovalCssRule: A11yRule = {
+  id: "focus-visual-removal-css",
+  languages: ["css"],
+  evaluate: (text) => validateFocusVisualRemoval(text),
+};

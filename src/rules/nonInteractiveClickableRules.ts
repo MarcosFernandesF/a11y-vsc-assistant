@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
 import { nonInteractiveClickableMessage } from "./educationMessages";
 
@@ -71,3 +71,9 @@ export function validateNonInteractiveClickableElements(text: string): RuleError
 
   return errors;
 }
+
+export const nonInteractiveClickableRule: A11yRule = {
+  id: "non-interactive-clickable",
+  languages: ["html"],
+  evaluate: (text) => validateNonInteractiveClickableElements(text),
+};

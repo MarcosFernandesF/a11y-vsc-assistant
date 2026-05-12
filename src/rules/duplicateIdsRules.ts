@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { parseHtmlAttributes } from "./utils/htmlAttributes";
 import { duplicateIdMessage } from "./educationMessages";
 
@@ -40,3 +40,9 @@ export function validateDuplicateIds(text: string): RuleError[] {
 
   return errors;
 }
+
+export const duplicateIdsRule: A11yRule = {
+  id: "duplicate-ids",
+  languages: ["html"],
+  evaluate: (text) => validateDuplicateIds(text),
+};

@@ -1,4 +1,4 @@
-import { RuleError } from "./types";
+import { A11yRule, RuleError } from "./types";
 import { imageAltMessage } from "./educationMessages";
 
 /**
@@ -30,3 +30,9 @@ export function validateImagesWithoutAlt(text: string): RuleError[] {
   }
   return errors;
 }
+
+export const imageAltRule: A11yRule = {
+  id: "image-alt",
+  languages: ["html"],
+  evaluate: (text) => validateImagesWithoutAlt(text),
+};

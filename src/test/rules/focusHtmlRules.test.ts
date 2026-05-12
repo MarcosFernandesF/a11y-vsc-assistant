@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateHtmlFocusVisible } from '../../rules/focusHtmlRules';
-import { TestCase } from './testTypes';
+import { focusHtmlRule } from '../../rules/focusHtmlRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runFocusHtmlRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de Foco Visivel em HTML...');
@@ -53,7 +53,7 @@ function runFocusHtmlRuleTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validateHtmlFocusVisible(testCase.html);
+    const results = focusHtmlRule.evaluate(testCase.html, buildRuleContext('html'));
     const observed = results.length;
 
     try {

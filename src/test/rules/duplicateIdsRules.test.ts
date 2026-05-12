@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateDuplicateIds } from '../../rules/duplicateIdsRules';
-import { TestCase } from './testTypes';
+import { duplicateIdsRule } from '../../rules/duplicateIdsRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runDuplicateIdsRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de IDs Duplicados (HTML)...');
@@ -41,7 +41,7 @@ function runDuplicateIdsRuleTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validateDuplicateIds(testCase.html);
+    const results = duplicateIdsRule.evaluate(testCase.html, buildRuleContext('html'));
     const observed = results.length;
 
     try {
