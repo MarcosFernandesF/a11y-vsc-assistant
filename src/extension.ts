@@ -124,8 +124,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	updateErrorSummaryBadge();
 
-	// Varre o workspace e valida todos os arquivos HTML/CSS ao ativar a extensao
-	// (nao bloqueia a ativacao principal)
 	scanWorkspaceAndValidateAll();
 
 	const documentChangeEvent = vscode.workspace.onDidChangeTextDocument(event => {

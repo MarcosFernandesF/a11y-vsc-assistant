@@ -12,26 +12,36 @@ export type A11yPanelExportEntry = {
   wcagReferenceKey?: WcagReferenceKey;
 };
 
+const ERROR_CATEGORIES = {
+  structure: 'Erros de Estrutura',
+  content: 'Erros de Conteudo',
+  focusNavigation: 'Erros de Foco e Navegacao',
+  interaction: 'Erros de Interacao',
+  visualPresentation: 'Erros de Apresentacao Visual',
+  zoomViewport: 'Erros de Zoom e Viewport',
+  other: 'Outros Erros',
+} as const;
+
 const ERROR_CATEGORY_BY_REFERENCE: Record<WcagReferenceKey, string> = {
-  duplicateIds: 'Erros de Estrutura',
-  headersHierarchy: 'Erros de Estrutura',
-  pageLanguage: 'Erros de Estrutura',
-  imageAlt: 'Erros de Conteudo',
-  focusVisualRemovalCss: 'Erros de Foco e Navegacao',
-  focusVisualRemovalHtml: 'Erros de Foco e Navegacao',
-  nonInteractiveClickable: 'Erros de Interacao',
-  justifyText: 'Erros de Apresentacao Visual',
-  zoomCapability: 'Erros de Zoom e Viewport',
+  duplicateIds: ERROR_CATEGORIES.structure,
+  headersHierarchy: ERROR_CATEGORIES.structure,
+  pageLanguage: ERROR_CATEGORIES.structure,
+  imageAlt: ERROR_CATEGORIES.content,
+  focusVisualRemovalCss: ERROR_CATEGORIES.focusNavigation,
+  focusVisualRemovalHtml: ERROR_CATEGORIES.focusNavigation,
+  nonInteractiveClickable: ERROR_CATEGORIES.interaction,
+  justifyText: ERROR_CATEGORIES.visualPresentation,
+  zoomCapability: ERROR_CATEGORIES.zoomViewport,
 };
 
 const CATEGORY_ICON_BY_NAME: Record<string, string> = {
-  'Erros de Estrutura': 'structure.svg',
-  'Erros de Conteudo': 'content.svg',
-  'Erros de Foco e Navegacao': 'focus.svg',
-  'Erros de Interacao': 'interaction.svg',
-  'Erros de Apresentacao Visual': 'visual.svg',
-  'Erros de Zoom e Viewport': 'zoom.svg',
-  'Outros Erros': 'others.svg',
+  [ERROR_CATEGORIES.structure]: 'structure.svg',
+  [ERROR_CATEGORIES.content]: 'content.svg',
+  [ERROR_CATEGORIES.focusNavigation]: 'focus.svg',
+  [ERROR_CATEGORIES.interaction]: 'interaction.svg',
+  [ERROR_CATEGORIES.visualPresentation]: 'visual.svg',
+  [ERROR_CATEGORIES.zoomViewport]: 'zoom.svg',
+  [ERROR_CATEGORIES.other]: 'others.svg',
 };
 
 export type A11yTreeItem = A11yFileTreeItem | A11yErrorCategoryTreeItem | A11yErrorTreeItem;
@@ -112,7 +122,6 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
-  // Map from document URI string to its category items
   private fileCategoryMap: Map<string, A11yErrorCategoryTreeItem[]> = new Map();
   private fileItems: A11yFileTreeItem[] = [];
 
@@ -291,7 +300,7 @@ function getErrorCategory(error: RuleError): string {
     return ERROR_CATEGORY_BY_REFERENCE[error.wcagReferenceKey];
   }
 
-  return 'Outros Erros';
+  return ERROR_CATEGORIES.other;
 }
 
 /**
