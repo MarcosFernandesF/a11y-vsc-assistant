@@ -50,8 +50,8 @@ export function activate(context: vscode.ExtensionContext) {
 					return;
 				}
 
-				validationService?.validateDocument(document);
-				const exportEntries = validationService?.errorSummaryProvider.getExportEntries(document) ?? [];
+				validationService!.validateDocument(document);
+				const exportEntries = validationService!.errorSummaryProvider.getExportEntries(document);
 				await writeReportForDocument(document, exportEntries);
 				vscode.window.showInformationMessage(`Relatorio exportado: ${path.basename(document.fileName)}`);
 			} catch (err) {
@@ -63,12 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const exportAllCommand = vscode.commands.registerCommand(
 		'a11y-vsc-assistant.exportAllAccessibilityReports',
 		async () => {
-			if (!validationService) {
-				vscode.window.showErrorMessage('Resumo de erros indisponivel para exportacao.');
-				return;
-			}
-
-			const uris = validationService.errorSummaryProvider.getFileUris();
+			const uris = validationService!.errorSummaryProvider.getFileUris();
 			if (uris.length === 0) {
 				vscode.window.showInformationMessage('Nenhum erro encontrado para exportacao.');
 				return;
@@ -77,8 +72,8 @@ export function activate(context: vscode.ExtensionContext) {
 			for (const uri of uris) {
 				try {
 					const doc = await vscode.workspace.openTextDocument(uri);
-					validationService.validateDocument(doc);
-					const entries = validationService.errorSummaryProvider.getExportEntries(doc);
+					validationService!.validateDocument(doc);
+					const entries = validationService!.errorSummaryProvider.getExportEntries(doc);
 					await writeReportForDocument(doc, entries);
 				} catch (err) {
 					console.error('Erro exportando relatorio para', uri.toString(), err);
