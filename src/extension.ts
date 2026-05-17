@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as os from 'os';
-import * as path from 'path';
 import { ValidationService } from './services/validationService';
-import { buildSafeReportFileName, formatA11yReport } from './reporting/exportReport';
+import { writeReportForDocument } from './reporting/exportReport';
 
 let validationService: ValidationService | undefined = undefined;
 
@@ -45,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 
 				const document = await vscode.workspace.openTextDocument(uri);
-				if (!isFileExtensionValid(document)) {
+				if (document.languageId !== 'html' && document.languageId !== 'css') {
 					vscode.window.showWarningMessage('A exportacao esta disponivel apenas para arquivos HTML e CSS.');
 					return;
 				}
@@ -53,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
 				validationService!.validateDocument(document);
 				const exportEntries = validationService!.errorSummaryProvider.getExportEntries(document);
 				await writeReportForDocument(document, exportEntries);
-				vscode.window.showInformationMessage(`Relatorio exportado: ${path.basename(document.fileName)}`);
+				vscode.window.showInformationMessage(`Relatorio exportado: ${document.fileName.split(/[\\/]/).pop() ?? document.fileName}`);
 			} catch (err) {
 				console.error('Erro ao exportar relatorio do arquivo', err);
 			}
@@ -95,26 +93,4 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 	validationService?.dispose();
 	validationService = undefined;
-}
-
-function isFileExtensionValid(document: vscode.TextDocument): boolean {
-	return document.languageId === 'html' || document.languageId === 'css';
-}
-
-async function writeReportForDocument(document: vscode.TextDocument, exportEntries: any[]): Promise<void> {
-	const reportText = formatA11yReport({
-		generatedAt: new Date().toISOString(),
-		sourceFile: vscode.workspace.asRelativePath(document.uri, false),
-		totalErrors: exportEntries.length,
-		errors: exportEntries,
-	});
-
-	const downloadsDir = path.join(os.homedir(), 'Downloads');
-	const downloadsDirUri = vscode.Uri.file(downloadsDir);
-	await vscode.workspace.fs.createDirectory(downloadsDirUri);
-
-	const reportFileName = buildSafeReportFileName(path.basename(document.fileName), new Date(), 'html');
-	const reportFileUri = vscode.Uri.joinPath(downloadsDirUri, reportFileName);
-
-	await vscode.workspace.fs.writeFile(reportFileUri, new TextEncoder().encode(reportText));
 }
