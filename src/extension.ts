@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as os from 'os';
 import * as path from 'path';
-import { createValidationService, ValidationService } from './services/validationService';
+import { ValidationService } from './services/validationService';
 import { buildSafeReportFileName, formatA11yReport } from './reporting/exportReport';
 
 let validationService: ValidationService | undefined = undefined;
@@ -12,7 +12,7 @@ let validationService: ValidationService | undefined = undefined;
  */
 export function activate(context: vscode.ExtensionContext) {
 	console.log('A11y Assistant Funcionando.');
-	validationService = createValidationService(context);
+	validationService = new ValidationService(context);
 	context.subscriptions.push(validationService);
 	validationService.start();
 
