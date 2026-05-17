@@ -44,7 +44,7 @@
       "a11yAssistant": [
         {
           "id": "a11yErrorSummary",
-          "name": "Resumo de Erros",
+          "name": "Abrir Resumo de Erros",
           "icon": "media/accessibility-icon.svg"
         }
       ]
