@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { RuleEngine } from '../rules/core/engine';
 import { allRules } from '../rules/core/registry';
-import { RuleError, RuleLanguage } from '../rules/core/types';
+import { RuleError } from '../rules/core/types';
 import { A11yErrorsTreeDataProvider, A11yTreeItem } from '../providers/errorSummaryProvider';
 import { DiagnosticsService } from './diagnosticsService';
+import { isSupportedLanguage } from '../utils/language';
 
 const ruleEngine = new RuleEngine(allRules);
 
@@ -37,7 +38,7 @@ export class ValidationService implements vscode.Disposable {
     const documentChangeEvent = vscode.workspace.onDidChangeTextDocument(event => {
       const document = event.document;
 
-      if (this.isSupportedLanguage(document.languageId)) {
+      if (isSupportedLanguage(document.languageId)) {
         if (this.timeout) {
           clearTimeout(this.timeout);
         }
@@ -56,7 +57,7 @@ export class ValidationService implements vscode.Disposable {
       }
 
       const document = editor.document;
-      if (this.isSupportedLanguage(document.languageId)) {
+      if (isSupportedLanguage(document.languageId)) {
         this.validateDocument(document);
       } else {
         this.clearDocument(document);
@@ -67,7 +68,7 @@ export class ValidationService implements vscode.Disposable {
   }
 
   validateDocument(document: vscode.TextDocument): void {
-    if (!this.isSupportedLanguage(document.languageId)) {
+    if (!isSupportedLanguage(document.languageId)) {
       return;
     }
 
@@ -115,7 +116,7 @@ export class ValidationService implements vscode.Disposable {
     }
 
     const document = editor.document;
-    if (this.isSupportedLanguage(document.languageId)) {
+    if (isSupportedLanguage(document.languageId)) {
       this.validateDocument(document);
     } else {
       this.clearDocument(document);
@@ -138,7 +139,7 @@ export class ValidationService implements vscode.Disposable {
         await Promise.all(batch.map(async uri => {
           try {
             const document = await vscode.workspace.openTextDocument(uri);
-            if (this.isSupportedLanguage(document.languageId)) {
+            if (isSupportedLanguage(document.languageId)) {
               this.validateDocument(document);
             }
           } catch (err) {
@@ -168,7 +169,4 @@ export class ValidationService implements vscode.Disposable {
     this.treeView.message = undefined;
   }
 
-  private isSupportedLanguage(languageId: string): languageId is RuleLanguage {
-    return languageId === 'html' || languageId === 'css';
-  }
 }

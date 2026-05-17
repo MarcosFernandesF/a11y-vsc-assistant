@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { ValidationService } from './services/validationService';
 import { writeReportForDocument } from './reporting/exportReport';
+import { isSupportedLanguage } from './utils/language';
 
 let validationService: ValidationService | undefined = undefined;
 
@@ -10,6 +11,7 @@ let validationService: ValidationService | undefined = undefined;
  */
 export function activate(context: vscode.ExtensionContext) {
 	console.log('A11y Assistant Funcionando.');
+
 	validationService = new ValidationService(context);
 	context.subscriptions.push(validationService);
 	validationService.start();
@@ -43,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 
 				const document = await vscode.workspace.openTextDocument(uri);
-				if (document.languageId !== 'html' && document.languageId !== 'css') {
+				if (!isSupportedLanguage(document.languageId)) {
 					vscode.window.showWarningMessage('A exportacao esta disponivel apenas para arquivos HTML e CSS.');
 					return;
 				}
