@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { zoomCapabilityRule } from '../../rules/zoomRules';
+import { zoomCapabilityRule } from '../../rules/html/zoomRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 type ZoomTestCase = TestCase<number> & {

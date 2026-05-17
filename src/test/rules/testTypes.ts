@@ -1,4 +1,4 @@
-import type { RuleContext, RuleLanguage } from "../../rules/types";
+import type { RuleContext, RuleLanguage } from "../../rules/core/types";
 
 export type TestCategory = "Conforme" | "Violacao" | "Inaplicavel";
 

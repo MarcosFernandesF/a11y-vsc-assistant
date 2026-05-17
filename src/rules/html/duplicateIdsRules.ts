@@ -1,6 +1,6 @@
-import { A11yRule, RuleError } from "./types";
-import { parseHtmlAttributes } from "./utils/htmlAttributes";
-import { duplicateIdMessage } from "./educationMessages";
+import { A11yRule, RuleError } from '../core/types';
+import { parseHtmlAttributes } from '../shared/utils/htmlAttributes';
+import { duplicateIdMessage } from '../shared/educationMessages';
 
 // Captura tags de abertura HTML para verificar repeticao de IDs no documento.
 const OPENING_TAG_REGEX = /<([a-z][\w:-]*)\b[^>]*>/gi;
@@ -19,7 +19,7 @@ export function validateDuplicateIds(text: string): RuleError[] {
   while ((match = OPENING_TAG_REGEX.exec(text)) !== null) {
     const entireTag = match[0];
     const attrs = parseHtmlAttributes(entireTag);
-    const id = attrs["id"];
+    const id = attrs['id'];
 
     if (!id) {
       continue;
@@ -30,7 +30,7 @@ export function validateDuplicateIds(text: string): RuleError[] {
         tag: entireTag,
         index: match.index,
         message: duplicateIdMessage(id),
-        wcagReferenceKey: "duplicateIds",
+        wcagReferenceKey: 'duplicateIds',
       });
       continue;
     }
@@ -42,7 +42,7 @@ export function validateDuplicateIds(text: string): RuleError[] {
 }
 
 export const duplicateIdsRule: A11yRule = {
-  id: "duplicate-ids",
-  languages: ["html"],
+  id: 'duplicate-ids',
+  languages: ['html'],
   evaluate: (text) => validateDuplicateIds(text),
 };

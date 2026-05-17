@@ -51,14 +51,6 @@
     },
     "commands": [
       {
-        "command": "a11y-vsc-assistant.exportAccessibilityReport",
-        "title": "A11y: Baixar relatório de acessibilidade (arquivo ativo)",
-        "icon": {
-          "light": "media/download-report.svg",
-          "dark": "media/download-report.svg"
-        }
-      },
-      {
         "command": "a11y-vsc-assistant.exportAccessibilityReportForFile",
         "title": "A11y: Baixar relatório deste arquivo",
         "icon": {

@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { pageLanguageRule } from '../../rules/languageRules';
+import { pageLanguageRule } from '../../rules/html/languageRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runLanguageRuleTests() {

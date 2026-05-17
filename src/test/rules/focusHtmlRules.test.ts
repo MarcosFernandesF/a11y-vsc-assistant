@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { focusHtmlRule } from '../../rules/focusHtmlRules';
+import { focusHtmlRule } from '../../rules/html/focusHtmlRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runFocusHtmlRuleTests() {

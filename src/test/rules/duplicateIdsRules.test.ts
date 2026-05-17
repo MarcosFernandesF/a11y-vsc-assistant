@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { duplicateIdsRule } from '../../rules/duplicateIdsRules';
+import { duplicateIdsRule } from '../../rules/html/duplicateIdsRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runDuplicateIdsRuleTests() {

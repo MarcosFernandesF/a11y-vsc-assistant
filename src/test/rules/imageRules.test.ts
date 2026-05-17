@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { imageAltRule } from '../../rules/imageRules';
+import { imageAltRule } from '../../rules/html/imageRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runImageTests() {

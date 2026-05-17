@@ -1,5 +1,5 @@
-import { A11yRule, RuleError } from "./types";
-import { justifyTextMessage } from "./educationMessages";
+import { A11yRule, RuleError } from '../core/types';
+import { justifyTextMessage } from '../shared/educationMessages';
 
 /**
  * Valida se o CSS possui uso de text-align: justify.
@@ -9,7 +9,7 @@ export function validateJustifiedCss(text: string): RuleError[] {
   const errors: RuleError[] = [];
 
   // Remove comentarios preservando tamanho para manter indices consistentes.
-  const cssWithoutComments = text.replace(/\/\*[\s\S]*?\*\//g, (comment) => " ".repeat(comment.length));
+  const cssWithoutComments = text.replace(/\/\*[\s\S]*?\*\//g, (comment) => ' '.repeat(comment.length));
   const justifyRegex = /text-align\s*:\s*justify\b/gi;
 
   let match: RegExpExecArray | null;
@@ -18,7 +18,7 @@ export function validateJustifiedCss(text: string): RuleError[] {
       tag: match[0],
       index: match.index,
       message: justifyTextMessage,
-      wcagReferenceKey: "justifyText",
+      wcagReferenceKey: 'justifyText',
     });
   }
 
@@ -26,7 +26,7 @@ export function validateJustifiedCss(text: string): RuleError[] {
 }
 
 export const justifyTextRule: A11yRule = {
-  id: "justify-text",
-  languages: ["css"],
+  id: 'justify-text',
+  languages: ['css'],
   evaluate: (text) => validateJustifiedCss(text),
 };

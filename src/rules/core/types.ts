@@ -1,6 +1,6 @@
-import { WcagReferenceKey } from "./wcagReferences";
+import { WcagReferenceKey } from './wcagReferences';
 
-export type RuleLanguage = "html" | "css";
+export type RuleLanguage = 'html' | 'css';
 
 export type RuleContext = {
   languageId: RuleLanguage;
@@ -10,7 +10,7 @@ export type RuleContext = {
 
 /**
  * Interface que representa o contrato de um erro de acessibilidade.
- * Utilizada para padronizar o retorno de todas as funções de validação.
+ * Utilizada para padronizar o retorno de todas as funcoes de validacao.
  */
 export interface RuleError {
   tag: string;

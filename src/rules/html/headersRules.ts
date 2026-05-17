@@ -1,9 +1,9 @@
-import { A11yRule, RuleError } from "./types";
+import { A11yRule, RuleError } from '../core/types';
 import {
   headersDecreasingOrderMessage,
   headersHierarchySkipMessage,
   headersMultipleH1Message,
-} from "./educationMessages";
+} from '../shared/educationMessages';
 
 /**
  * Valida se os cabeçalhos estão em um ordem lógica (h1 a h6).
@@ -40,7 +40,7 @@ export function validateHeadersOrder(text: string): RuleError[] {
         tag: header.text,
         index: header.index,
         message: headersHierarchySkipMessage(header.text),
-        wcagReferenceKey: "headersHierarchy",
+        wcagReferenceKey: 'headersHierarchy',
       });
     }
 
@@ -49,7 +49,7 @@ export function validateHeadersOrder(text: string): RuleError[] {
         tag: header.text,
         index: header.index,
         message: headersMultipleH1Message(header.text),
-        wcagReferenceKey: "headersHierarchy",
+        wcagReferenceKey: 'headersHierarchy',
       });
     }
 
@@ -58,7 +58,7 @@ export function validateHeadersOrder(text: string): RuleError[] {
         tag: header.text,
         index: header.index,
         message: headersDecreasingOrderMessage(header.text),
-        wcagReferenceKey: "headersHierarchy",
+        wcagReferenceKey: 'headersHierarchy',
       });
     }
 
@@ -69,7 +69,7 @@ export function validateHeadersOrder(text: string): RuleError[] {
 }
 
 export const headersHierarchyRule: A11yRule = {
-  id: "headers-hierarchy",
-  languages: ["html"],
+  id: 'headers-hierarchy',
+  languages: ['html'],
   evaluate: (text) => validateHeadersOrder(text),
 };

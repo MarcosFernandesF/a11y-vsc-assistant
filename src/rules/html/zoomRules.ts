@@ -1,6 +1,6 @@
-import { A11yRule, RuleError } from "./types";
-import { parseHtmlAttributes } from "./utils/htmlAttributes";
-import { zoomMaximumScaleMessage, zoomUserScalableMessage } from "./educationMessages";
+import { A11yRule, RuleError } from '../core/types';
+import { parseHtmlAttributes } from '../shared/utils/htmlAttributes';
+import { zoomMaximumScaleMessage, zoomUserScalableMessage } from '../shared/educationMessages';
 
 // Localiza rapidamente cada tag <meta ...> no HTML para filtrar apenas
 // as meta viewport, sem depender de parser DOM no contexto da extensao.
@@ -14,11 +14,11 @@ function parseViewportContent(content: string): Record<string, string> {
   const parts = content.split(/[,;]/);
 
   for (const part of parts) {
-    const [rawKey, ...rawValueParts] = part.split("=");
-    const key = (rawKey ?? "").trim().toLowerCase();
-    const value = rawValueParts.join("=").trim().toLowerCase();
+    const [rawKey, ...rawValueParts] = part.split('=');
+    const key = (rawKey ?? '').trim().toLowerCase();
+    const value = rawValueParts.join('=').trim().toLowerCase();
 
-    if (!key || value === "") {
+    if (!key || value === '') {
       continue;
     }
 
@@ -32,7 +32,7 @@ function parseViewportContent(content: string): Record<string, string> {
  * Encontra o índice de um atributo específico dentro da tag inteira.
  */
 function getAttributeIndexInTag(tag: string, attributeName: string): { index: number; length: number } | null {
-  const regex = new RegExp(`\\b${attributeName}\\s*=\\s*["\']?[^"\'\\s>]+["\']?`, "i");
+  const regex = new RegExp(`\\b${attributeName}\\s*=\\s*["\']?[^"\'\\s>]+["\']?`, 'i');
   const match = regex.exec(tag);
   return match ? { index: match.index, length: match[0].length } : null;
 }
@@ -41,7 +41,7 @@ function getAttributeIndexInTag(tag: string, attributeName: string): { index: nu
  * Determina se o valor de maximum-scale bloqueia zoom ate 200%.
  */
 function isMaximumScaleBlocking(rawValue: string): boolean {
-  if (rawValue === "yes") {
+  if (rawValue === 'yes') {
     return true;
   }
 
@@ -72,21 +72,21 @@ export function validateZoomCapability(text: string): RuleError[] {
   while ((match = META_TAG_REGEX.exec(text)) !== null) {
     const entireTag = match[0];
     const attrs = parseHtmlAttributes(entireTag);
-    const name = attrs["name"]?.toLowerCase();
+    const name = attrs['name']?.toLowerCase();
 
-    if (name !== "viewport") {
+    if (name !== 'viewport') {
       continue;
     }
 
-    if (!("content" in attrs)) {
+    if (!('content' in attrs)) {
       continue;
     }
 
-    const directives = parseViewportContent(attrs["content"]);
+    const directives = parseViewportContent(attrs['content']);
 
-    const hasUserScalableNo = directives["user-scalable"] === "no";
-    const hasMaximumScaleBlocking = directives["maximum-scale"] ?
-      isMaximumScaleBlocking(directives["maximum-scale"]) :
+    const hasUserScalableNo = directives['user-scalable'] === 'no';
+    const hasMaximumScaleBlocking = directives['maximum-scale'] ?
+      isMaximumScaleBlocking(directives['maximum-scale']) :
       false;
 
     if (!hasUserScalableNo && !hasMaximumScaleBlocking) {
@@ -94,26 +94,26 @@ export function validateZoomCapability(text: string): RuleError[] {
     }
 
     if (hasUserScalableNo) {
-      const userScalableAttr = getAttributeIndexInTag(entireTag, "user-scalable");
+      const userScalableAttr = getAttributeIndexInTag(entireTag, 'user-scalable');
       if (userScalableAttr) {
         errors.push({
           tag: entireTag,
           index: match.index + userScalableAttr.index,
           message: zoomUserScalableMessage,
-          wcagReferenceKey: "zoomCapability",
+          wcagReferenceKey: 'zoomCapability',
           tagLength: userScalableAttr.length,
         });
       }
     }
 
     if (hasMaximumScaleBlocking) {
-      const maximumScaleAttr = getAttributeIndexInTag(entireTag, "maximum-scale");
+      const maximumScaleAttr = getAttributeIndexInTag(entireTag, 'maximum-scale');
       if (maximumScaleAttr) {
         errors.push({
           tag: entireTag,
           index: match.index + maximumScaleAttr.index,
-          message: zoomMaximumScaleMessage(directives["maximum-scale"]),
-          wcagReferenceKey: "zoomCapability",
+          message: zoomMaximumScaleMessage(directives['maximum-scale']),
+          wcagReferenceKey: 'zoomCapability',
           tagLength: maximumScaleAttr.length,
         });
       }
@@ -124,7 +124,7 @@ export function validateZoomCapability(text: string): RuleError[] {
 }
 
 export const zoomCapabilityRule: A11yRule = {
-  id: "zoom-capability",
-  languages: ["html"],
+  id: 'zoom-capability',
+  languages: ['html'],
   evaluate: (text) => validateZoomCapability(text),
 };

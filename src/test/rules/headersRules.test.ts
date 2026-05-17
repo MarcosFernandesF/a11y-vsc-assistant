@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { headersHierarchyRule } from '../../rules/headersRules';
+import { headersHierarchyRule } from '../../rules/html/headersRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runHeadersTests() {

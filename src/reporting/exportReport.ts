@@ -7,7 +7,7 @@ export type A11yErrorExportItem = {
   line: number;
   column: number;
   codeSnippet: string;
-  wcagReferenceKey?: import('./rules/wcagReferences').WcagReferenceKey;
+  wcagReferenceKey?: import('../rules/core/wcagReferences').WcagReferenceKey;
 };
 
 export type A11yReportPayload = {

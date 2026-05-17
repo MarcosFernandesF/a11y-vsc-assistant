@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { focusVisualRemovalCssRule } from '../../rules/focusRules';
+import { focusVisualRemovalCssRule } from '../../rules/css/focusRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runFocusRuleTests() {

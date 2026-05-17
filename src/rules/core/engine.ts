@@ -1,7 +1,7 @@
-import { A11yRule, RuleContext, RuleError } from "./types";
+import { A11yRule, RuleContext, RuleError } from './types';
 
 export class RuleEngine {
-  constructor(private readonly rules: A11yRule[]) {}
+  constructor(private readonly rules: A11yRule[]) { }
 
   run(text: string, context: RuleContext): RuleError[] {
     const errors: RuleError[] = [];

@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { justifyTextRule } from '../../rules/justifyRules';
+import { justifyTextRule } from '../../rules/css/justifyRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runJustifyRuleTests() {

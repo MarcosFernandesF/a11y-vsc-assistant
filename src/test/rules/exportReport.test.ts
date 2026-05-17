@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { buildSafeReportFileName, formatA11yReport } from '../../exportReport';
+import { buildSafeReportFileName, formatA11yReport } from '../../reporting/exportReport';
 
 function runExportReportTests() {
   console.log('Iniciando Testes Unitarios: Exportacao de Relatorio...');

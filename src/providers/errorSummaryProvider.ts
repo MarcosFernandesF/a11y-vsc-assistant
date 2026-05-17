@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-import { RuleError } from './rules/types';
-import type { WcagReferenceKey } from './rules/wcagReferences';
+import { RuleError } from '../rules/core/types';
+import type { WcagReferenceKey } from '../rules/core/wcagReferences';
+import { createSafeRange } from '../utils/range';
 
 export type A11yPanelExportEntry = {
   category: string;
@@ -90,15 +91,15 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
   public readonly wcagReferenceKey?: WcagReferenceKey;
 
   constructor(document: vscode.TextDocument, error: RuleError) {
-    const startPosition = document.positionAt(error.index);
-    const endPosition = createEndPosition(document, startPosition, error);
+    const range = createSafeRange(document, error.index, error.tagLength ?? error.tag?.length ?? 0);
+    const startPosition = range.start;
 
     const panelTitle = extractPanelTitle(error.message);
 
     super(panelTitle, vscode.TreeItemCollapsibleState.None);
 
     this.uri = document.uri;
-    this.range = new vscode.Range(startPosition, endPosition);
+    this.range = range;
     this.panelSummary = panelTitle;
     this.detailsMessage = error.message;
     this.wcagReferenceKey = error.wcagReferenceKey;
@@ -166,15 +167,6 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
   removeErrorsForDocument(document: vscode.TextDocument): void {
     this.fileCategoryMap.delete(document.uri.toString());
     this.rebuildFileItems();
-    this.onDidChangeTreeDataEmitter.fire();
-  }
-
-  /**
-   * Limpa o painel de resumo e remove os erros do documento atual.
-   */
-  clear(): void {
-    this.fileCategoryMap.clear();
-    this.fileItems = [];
     this.onDidChangeTreeDataEmitter.fire();
   }
 
@@ -262,23 +254,6 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
 
     return vscode.Uri.joinPath(this.extensionUri, 'media', 'categories', fileName);
   }
-}
-
-/**
- * Calcula a posicao final do range do erro com base no indice inicial e no
- * tamanho da tag, garantindo pelo menos um caractere valido para destaque.
- */
-function createEndPosition(document: vscode.TextDocument, startPosition: vscode.Position, error: RuleError): vscode.Position {
-  const textLength = document.getText().length;
-  const startOffset = document.offsetAt(startPosition);
-  const rawTagLength = error.tagLength ?? error.tag?.length ?? 0;
-  let endOffset = Math.max(startOffset, Math.min(startOffset + Math.max(rawTagLength, 1), textLength));
-
-  if (endOffset === startOffset && startOffset < textLength) {
-    endOffset = startOffset + 1;
-  }
-
-  return document.positionAt(endOffset);
 }
 
 /**

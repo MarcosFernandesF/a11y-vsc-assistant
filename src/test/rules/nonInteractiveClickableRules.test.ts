@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { nonInteractiveClickableRule } from '../../rules/nonInteractiveClickableRules';
+import { nonInteractiveClickableRule } from '../../rules/html/nonInteractiveClickableRules';
 import { buildRuleContext, TestCase } from './testTypes';
 
 function runNonInteractiveClickableTests() {
