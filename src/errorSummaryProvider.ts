@@ -46,6 +46,9 @@ const CATEGORY_ICON_BY_NAME: Record<string, string> = {
 
 export type A11yTreeItem = A11yFileTreeItem | A11yErrorCategoryTreeItem | A11yErrorTreeItem;
 
+/**
+ * Item raiz do TreeView que representa um arquivo com erros de acessibilidade.
+ */
 export class A11yFileTreeItem extends vscode.TreeItem {
   public readonly uri: vscode.Uri;
   public readonly children: A11yErrorCategoryTreeItem[];
@@ -60,6 +63,9 @@ export class A11yFileTreeItem extends vscode.TreeItem {
   }
 }
 
+/**
+ * Item intermediario do TreeView que agrupa os erros de um arquivo por categoria.
+ */
 export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
   constructor(
     public readonly categoryName: string,
@@ -74,7 +80,7 @@ export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
 }
 
 /**
- * Item exibido no painel de resumo de erros com contexto para navegacao.
+ * Item folha do TreeView que representa um erro individual de acessibilidade.
  */
 export class A11yErrorTreeItem extends vscode.TreeItem {
   public readonly uri: vscode.Uri;
@@ -114,7 +120,7 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
 }
 
 /**
- * Provedor de dados do TreeView para apresentar o resumo de erros.
+ * Provedor de dados do TreeView que organiza os erros por arquivo e categoria.
  */
 export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yTreeItem> {
   constructor(private readonly extensionUri: vscode.Uri) { }
