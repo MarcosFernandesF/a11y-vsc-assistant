@@ -10,7 +10,7 @@ let validationService: ValidationService | undefined = undefined;
  * os eventos para validar documentos HTML/CSS em tempo real.
  */
 export function activate(context: vscode.ExtensionContext) {
-	console.log('A11y Assistant Funcionando.');
+	console.log('A11y Assistant Rodando.');
 
 	validationService = new ValidationService(context);
 	context.subscriptions.push(validationService);

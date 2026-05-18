@@ -69,10 +69,6 @@ export class ValidationService implements vscode.Disposable {
     this.errorSummaryProvider.setErrors(document, errors);
     this.updateErrorSummaryBadge();
 
-    errors.forEach(error => {
-      const startPosition = document.positionAt(error.index);
-      console.log(`[Linha ${startPosition.line + 1}] ${error.message}`);
-    });
   }
 
   clearDocument(document: vscode.TextDocument): void {
