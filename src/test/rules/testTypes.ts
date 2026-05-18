@@ -1,3 +1,5 @@
+import type { RuleContext, RuleLanguage } from "../../rules/core/types";
+
 export type TestCategory = "Conforme" | "Violacao" | "Inaplicavel";
 
 export type TestCase<T = number> = {
@@ -6,3 +8,10 @@ export type TestCase<T = number> = {
   expected: T;
   category: TestCategory;
 };
+
+export function buildRuleContext(languageId: RuleLanguage): RuleContext {
+  return {
+    languageId,
+    uri: "test://fixture",
+  };
+}

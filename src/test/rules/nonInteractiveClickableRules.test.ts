@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateNonInteractiveClickableElements } from '../../rules/nonInteractiveClickableRules';
-import { TestCase } from './testTypes';
+import { nonInteractiveClickableRule } from '../../rules/html/nonInteractiveClickableRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runNonInteractiveClickableTests() {
   console.log('Iniciando Testes Unitarios: Regra de Elementos Nao Interativos Clicaveis...');
@@ -71,7 +71,7 @@ function runNonInteractiveClickableTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validateNonInteractiveClickableElements(testCase.html);
+    const results = nonInteractiveClickableRule.evaluate(testCase.html, buildRuleContext('html'));
     const observed = results.length;
     try {
       assert.strictEqual(observed, testCase.expected);

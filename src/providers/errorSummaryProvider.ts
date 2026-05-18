@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-import { RuleError } from './rules/types';
-import type { WcagReferenceKey } from './rules/wcagReferences';
+import { RuleError } from '../rules/core/types';
+import type { WcagReferenceKey } from '../rules/core/wcagReferences';
+import { createSafeRange } from '../utils/range';
 
 export type A11yPanelExportEntry = {
   category: string;
@@ -12,43 +13,60 @@ export type A11yPanelExportEntry = {
   wcagReferenceKey?: WcagReferenceKey;
 };
 
+const ERROR_CATEGORIES = {
+  structure: 'Erros de Estrutura',
+  content: 'Erros de Conteudo',
+  focusNavigation: 'Erros de Foco e Navegacao',
+  interaction: 'Erros de Interacao',
+  visualPresentation: 'Erros de Apresentacao Visual',
+  zoomViewport: 'Erros de Zoom e Viewport',
+  other: 'Outros Erros',
+} as const;
+
 const ERROR_CATEGORY_BY_REFERENCE: Record<WcagReferenceKey, string> = {
-  duplicateIds: 'Erros de Estrutura',
-  headersHierarchy: 'Erros de Estrutura',
-  pageLanguage: 'Erros de Estrutura',
-  imageAlt: 'Erros de Conteudo',
-  focusVisualRemovalCss: 'Erros de Foco e Navegacao',
-  focusVisualRemovalHtml: 'Erros de Foco e Navegacao',
-  nonInteractiveClickable: 'Erros de Interacao',
-  justifyText: 'Erros de Apresentacao Visual',
-  zoomCapability: 'Erros de Zoom e Viewport',
+  duplicateIds: ERROR_CATEGORIES.structure,
+  headersHierarchy: ERROR_CATEGORIES.structure,
+  pageLanguage: ERROR_CATEGORIES.structure,
+  imageAlt: ERROR_CATEGORIES.content,
+  focusVisualRemovalCss: ERROR_CATEGORIES.focusNavigation,
+  focusVisualRemovalHtml: ERROR_CATEGORIES.focusNavigation,
+  nonInteractiveClickable: ERROR_CATEGORIES.interaction,
+  justifyText: ERROR_CATEGORIES.visualPresentation,
+  zoomCapability: ERROR_CATEGORIES.zoomViewport,
 };
 
 const CATEGORY_ICON_BY_NAME: Record<string, string> = {
-  'Erros de Estrutura': 'structure.svg',
-  'Erros de Conteudo': 'content.svg',
-  'Erros de Foco e Navegacao': 'focus.svg',
-  'Erros de Interacao': 'interaction.svg',
-  'Erros de Apresentacao Visual': 'visual.svg',
-  'Erros de Zoom e Viewport': 'zoom.svg',
-  'Outros Erros': 'others.svg',
+  [ERROR_CATEGORIES.structure]: 'structure.svg',
+  [ERROR_CATEGORIES.content]: 'content.svg',
+  [ERROR_CATEGORIES.focusNavigation]: 'focus.svg',
+  [ERROR_CATEGORIES.interaction]: 'interaction.svg',
+  [ERROR_CATEGORIES.visualPresentation]: 'visual.svg',
+  [ERROR_CATEGORIES.zoomViewport]: 'zoom.svg',
+  [ERROR_CATEGORIES.other]: 'others.svg',
 };
 
 export type A11yTreeItem = A11yFileTreeItem | A11yErrorCategoryTreeItem | A11yErrorTreeItem;
 
+/**
+ * Item raiz do TreeView que representa um arquivo com erros de acessibilidade.
+ */
 export class A11yFileTreeItem extends vscode.TreeItem {
-  constructor(
-    public readonly uri: vscode.Uri,
-    public readonly children: A11yErrorCategoryTreeItem[]
-  ) {
-    super(vscode.workspace.asRelativePath(uri, false), vscode.TreeItemCollapsibleState.Expanded);
-    this.description = `${children.reduce((total, category) => total + category.children.length, 0)} erro(s)`;
+  public readonly uri: vscode.Uri;
+  public readonly children: A11yErrorCategoryTreeItem[];
+
+  constructor(uri: vscode.Uri, fileName: string, children: A11yErrorCategoryTreeItem[], icon?: vscode.ThemeIcon) {
+    super(fileName, vscode.TreeItemCollapsibleState.Collapsed);
+    this.uri = uri;
+    this.children = children;
+    this.description = `${children.reduce((s, c) => s + c.children.length, 0)} erro(s)`;
     this.contextValue = 'a11yFile';
-    this.iconPath = new vscode.ThemeIcon('file');
-    this.tooltip = vscode.workspace.asRelativePath(uri, false);
+    this.iconPath = icon ?? new vscode.ThemeIcon('file');
   }
 }
 
+/**
+ * Item intermediario do TreeView que agrupa os erros de um arquivo por categoria.
+ */
 export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
   constructor(
     public readonly categoryName: string,
@@ -63,7 +81,7 @@ export class A11yErrorCategoryTreeItem extends vscode.TreeItem {
 }
 
 /**
- * Item exibido no painel de resumo de erros com contexto para navegacao.
+ * Item folha do TreeView que representa um erro individual de acessibilidade.
  */
 export class A11yErrorTreeItem extends vscode.TreeItem {
   public readonly uri: vscode.Uri;
@@ -73,15 +91,15 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
   public readonly wcagReferenceKey?: WcagReferenceKey;
 
   constructor(document: vscode.TextDocument, error: RuleError) {
-    const startPosition = document.positionAt(error.index);
-    const endPosition = createEndPosition(document, startPosition, error);
+    const range = createSafeRange(document, error.index, error.tagLength ?? error.tag?.length ?? 0);
+    const startPosition = range.start;
 
     const panelTitle = extractPanelTitle(error.message);
 
     super(panelTitle, vscode.TreeItemCollapsibleState.None);
 
     this.uri = document.uri;
-    this.range = new vscode.Range(startPosition, endPosition);
+    this.range = range;
     this.panelSummary = panelTitle;
     this.detailsMessage = error.message;
     this.wcagReferenceKey = error.wcagReferenceKey;
@@ -103,7 +121,7 @@ export class A11yErrorTreeItem extends vscode.TreeItem {
 }
 
 /**
- * Provedor de dados do TreeView para apresentar o resumo de erros.
+ * Provedor de dados do TreeView que organiza os erros por arquivo e categoria.
  */
 export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yTreeItem> {
   constructor(private readonly extensionUri: vscode.Uri) { }
@@ -111,6 +129,7 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
   private readonly onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
+  private fileCategoryMap: Map<string, A11yErrorCategoryTreeItem[]> = new Map();
   private fileItems: A11yFileTreeItem[] = [];
 
   /**
@@ -134,45 +153,20 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
       })
       .sort((a, b) => b.children.length - a.children.length || a.categoryName.localeCompare(b.categoryName));
 
+    const key = document.uri.toString();
     if (categoryItems.length === 0) {
-      this.clearFile(document.uri);
-      return;
-    }
-
-    const nextFileItem = new A11yFileTreeItem(document.uri, categoryItems);
-    const fileKey = document.uri.toString();
-    const existingIndex = this.fileItems.findIndex(item => item.uri.toString() === fileKey);
-
-    if (existingIndex >= 0) {
-      this.fileItems.splice(existingIndex, 1, nextFileItem);
+      this.fileCategoryMap.delete(key);
     } else {
-      this.fileItems.push(nextFileItem);
+      this.fileCategoryMap.set(key, categoryItems);
     }
 
-    this.fileItems.sort((a, b) => a.uri.fsPath.localeCompare(b.uri.fsPath));
-
+    this.rebuildFileItems();
     this.onDidChangeTreeDataEmitter.fire();
   }
 
-  /**
-   * Remove os erros associados a um arquivo específico.
-   */
-  clearFile(uri: vscode.Uri): void {
-    const fileKey = uri.toString();
-    const nextLength = this.fileItems.length;
-
-    this.fileItems = this.fileItems.filter(item => item.uri.toString() !== fileKey);
-
-    if (this.fileItems.length !== nextLength) {
-      this.onDidChangeTreeDataEmitter.fire();
-    }
-  }
-
-  /**
-   * Limpa o painel de resumo e remove todos os erros.
-   */
-  clear(): void {
-    this.fileItems = [];
+  removeErrorsForDocument(document: vscode.TextDocument): void {
+    this.fileCategoryMap.delete(document.uri.toString());
+    this.rebuildFileItems();
     this.onDidChangeTreeDataEmitter.fire();
   }
 
@@ -207,28 +201,45 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
    * Soma todos os erros atualmente exibidos no painel.
    */
   getTotalErrors(): number {
-    return this.fileItems.reduce((total, fileItem) => {
-      return total + fileItem.children.reduce((categoryTotal, category) => categoryTotal + category.children.length, 0);
-    }, 0);
+    let total = 0;
+    for (const categories of this.fileCategoryMap.values()) {
+      for (const cat of categories) {
+        total += cat.children.length;
+      }
+    }
+    return total;
   }
 
   /**
    * Converte os itens do painel em um payload pronto para exportacao.
    */
   getExportEntries(document: vscode.TextDocument): A11yPanelExportEntry[] {
-    return this.fileItems
-      .find(item => item.uri.toString() === document.uri.toString())
-      ?.children.flatMap(categoryItem =>
-        categoryItem.children.map(errorItem => ({
-          category: categoryItem.categoryName,
-          summary: errorItem.panelSummary,
-          details: errorItem.detailsMessage,
-          line: errorItem.range.start.line + 1,
-          column: errorItem.range.start.character + 1,
-          codeSnippet: getCodeSnippet(document, errorItem.range),
-          wcagReferenceKey: errorItem.wcagReferenceKey,
-        }))
-      ) ?? [];
+    const key = document.uri.toString();
+    const categories = this.fileCategoryMap.get(key) ?? [];
+    return categories.flatMap(categoryItem =>
+      categoryItem.children.map(errorItem => ({
+        category: categoryItem.categoryName,
+        summary: errorItem.panelSummary,
+        details: errorItem.detailsMessage,
+        line: errorItem.range.start.line + 1,
+        column: errorItem.range.start.character + 1,
+        codeSnippet: getCodeSnippet(document, errorItem.range),
+        wcagReferenceKey: errorItem.wcagReferenceKey,
+      }))
+    );
+  }
+
+  /** Retorna as URIs dos arquivos que contém erros no resumo */
+  getFileUris(): vscode.Uri[] {
+    return Array.from(this.fileCategoryMap.keys()).map(k => vscode.Uri.parse(k));
+  }
+
+  private rebuildFileItems(): void {
+    this.fileItems = Array.from(this.fileCategoryMap.entries()).map(([uriString, categories]) => {
+      const uri = vscode.Uri.parse(uriString);
+      const fileName = vscode.workspace.asRelativePath(uri, false);
+      return new A11yFileTreeItem(uri, fileName, categories);
+    }).sort((a, b) => a.label!.toString().localeCompare(b.label!.toString()));
   }
 
   /**
@@ -243,23 +254,6 @@ export class A11yErrorsTreeDataProvider implements vscode.TreeDataProvider<A11yT
 
     return vscode.Uri.joinPath(this.extensionUri, 'media', 'categories', fileName);
   }
-}
-
-/**
- * Calcula a posicao final do range do erro com base no indice inicial e no
- * tamanho da tag, garantindo pelo menos um caractere valido para destaque.
- */
-function createEndPosition(document: vscode.TextDocument, startPosition: vscode.Position, error: RuleError): vscode.Position {
-  const textLength = document.getText().length;
-  const startOffset = document.offsetAt(startPosition);
-  const rawTagLength = error.tagLength ?? error.tag?.length ?? 0;
-  let endOffset = Math.max(startOffset, Math.min(startOffset + Math.max(rawTagLength, 1), textLength));
-
-  if (endOffset === startOffset && startOffset < textLength) {
-    endOffset = startOffset + 1;
-  }
-
-  return document.positionAt(endOffset);
 }
 
 /**
@@ -287,7 +281,7 @@ function getErrorCategory(error: RuleError): string {
     return ERROR_CATEGORY_BY_REFERENCE[error.wcagReferenceKey];
   }
 
-  return 'Outros Erros';
+  return ERROR_CATEGORIES.other;
 }
 
 /**

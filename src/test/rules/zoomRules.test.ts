@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateZoomCapability } from '../../rules/zoomRules';
-import { TestCase } from './testTypes';
+import { zoomCapabilityRule } from '../../rules/html/zoomRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 type ZoomTestCase = TestCase<number> & {
   expectedMessageIncludes?: string[];
@@ -88,7 +88,7 @@ function runZoomTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validateZoomCapability(testCase.html);
+    const results = zoomCapabilityRule.evaluate(testCase.html, buildRuleContext('html'));
     const observed = results.length;
 
     try {

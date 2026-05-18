@@ -14,7 +14,7 @@ export function parseHtmlAttributes(tag: string): Record<string, string> {
 
   while ((attrMatch = HTML_ATTRIBUTE_REGEX.exec(tag)) !== null) {
     const name = attrMatch[1].toLowerCase();
-    const value = (attrMatch[3] ?? attrMatch[4] ?? attrMatch[5] ?? "").trim();
+    const value = (attrMatch[3] ?? attrMatch[4] ?? attrMatch[5] ?? '').trim();
     attrs[name] = value;
   }
 

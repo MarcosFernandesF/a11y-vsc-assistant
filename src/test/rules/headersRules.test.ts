@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateHeadersOrder } from '../../rules/headersRules';
-import { TestCase } from './testTypes';
+import { headersHierarchyRule } from '../../rules/html/headersRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runHeadersTests() {
   console.log('Iniciando Testes Unitarios: Regras de Hierarquia de Cabecalhos...');
@@ -22,7 +22,7 @@ function runHeadersTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validateHeadersOrder(testCase.html);
+    const results = headersHierarchyRule.evaluate(testCase.html, buildRuleContext('html'));
     const observed = results.length;
     try {
       assert.strictEqual(observed, testCase.expected);

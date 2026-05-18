@@ -1,5 +1,5 @@
-import { RuleError } from "./types";
-import { imageAltMessage } from "./educationMessages";
+import { A11yRule, RuleError } from '../core/types';
+import { imageAltMessage } from '../shared/educationMessages';
 
 /**
  * Valida se as tags <img> possuem um atributo 'alt' não vazio.
@@ -12,7 +12,7 @@ export function validateImagesWithoutAlt(text: string): RuleError[] {
   const imgTagRegex = /<img[^>]*>/gi;
 
   // Regex robusta para validar o 'alt' com conteúdo, ignorando a ordem dos atributos.
-  const validAltRegex = /<img\s+(?=[^>]*?\balt=["'](?!\s*["'])[^"']+?["'])[^>]*?>/i;
+  const validAltRegex = /<img\s+(?=[^>]*?\balt=["'](?!\s*["'])[^"]+?["'])[^>]*?>/i;
 
   let match;
   while ((match = imgTagRegex.exec(text)) !== null) {
@@ -24,9 +24,15 @@ export function validateImagesWithoutAlt(text: string): RuleError[] {
         tag: entireTag,
         index: match.index,
         message: imageAltMessage,
-        wcagReferenceKey: "imageAlt",
+        wcagReferenceKey: 'imageAlt',
       });
     }
   }
   return errors;
 }
+
+export const imageAltRule: A11yRule = {
+  id: 'image-alt',
+  languages: ['html'],
+  evaluate: (text) => validateImagesWithoutAlt(text),
+};

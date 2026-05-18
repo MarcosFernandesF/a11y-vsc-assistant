@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validateJustifiedCss } from '../../rules/justifyRules';
-import { TestCase } from './testTypes';
+import { justifyTextRule } from '../../rules/css/justifyRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runJustifyRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de Texto Justificado (CSS)...');
@@ -41,7 +41,7 @@ function runJustifyRuleTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validateJustifiedCss(testCase.html);
+    const results = justifyTextRule.evaluate(testCase.html, buildRuleContext('css'));
     const observed = results.length;
     try {
       assert.strictEqual(observed, testCase.expected);

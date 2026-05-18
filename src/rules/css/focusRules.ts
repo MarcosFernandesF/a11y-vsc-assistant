@@ -1,5 +1,5 @@
-import { RuleError } from "./types";
-import { focusVisualRemovalCssMessage } from "./educationMessages";
+import { A11yRule, RuleError } from '../core/types';
+import { focusVisualRemovalCssMessage } from '../shared/educationMessages';
 
 // Divide o CSS em blocos "seletor { declaracoes }" para avaliacao por contexto.
 const CSS_BLOCK_REGEX = /([^{}]+)\{([^}]*)\}/g;
@@ -43,16 +43,15 @@ export function validateFocusVisualRemoval(text: string): RuleError[] {
   const errors: RuleError[] = [];
 
   // Remove comentarios preservando tamanho para manter indices consistentes.
-  const cssWithoutComments = text.replace(/\/\*[\s\S]*?\*\//g, (comment) => " ".repeat(comment.length));
+  const cssWithoutComments = text.replace(/\/\*[\s\S]*?\*\//g, (comment) => ' '.repeat(comment.length));
 
   CSS_BLOCK_REGEX.lastIndex = 0;
 
   let blockMatch: RegExpExecArray | null;
   while ((blockMatch = CSS_BLOCK_REGEX.exec(cssWithoutComments)) !== null) {
-    const selector = blockMatch[1].trim();
     const declarations = blockMatch[2];
     const blockStartIndex = blockMatch.index;
-    const declarationsStartIndex = blockStartIndex + blockMatch[0].indexOf("{") + 1;
+    const declarationsStartIndex = blockStartIndex + blockMatch[0].indexOf('{') + 1;
 
     OUTLINE_REMOVAL_REGEX.lastIndex = 0;
     const hasAlternativeIndicator = hasAlternativeFocusIndicator(declarations);
@@ -67,10 +66,16 @@ export function validateFocusVisualRemoval(text: string): RuleError[] {
         tag: outlineMatch[0],
         index: declarationsStartIndex + outlineMatch.index,
         message: focusVisualRemovalCssMessage,
-        wcagReferenceKey: "focusVisualRemovalCss",
+        wcagReferenceKey: 'focusVisualRemovalCss',
       });
     }
   }
 
   return errors;
 }
+
+export const focusVisualRemovalCssRule: A11yRule = {
+  id: 'focus-visual-removal-css',
+  languages: ['css'],
+  evaluate: (text) => validateFocusVisualRemoval(text),
+};

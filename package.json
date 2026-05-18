@@ -44,15 +44,23 @@
       "a11yAssistant": [
         {
           "id": "a11yErrorSummary",
-          "name": "Resumo de Erros",
+          "name": "Abrir Resumo de Erros",
           "icon": "media/accessibility-icon.svg"
         }
       ]
     },
     "commands": [
       {
-        "command": "a11y-vsc-assistant.exportAccessibilityReport",
-        "title": "A11y: Baixar relatório de acessibilidade",
+        "command": "a11y-vsc-assistant.exportAccessibilityReportForFile",
+        "title": "A11y: Baixar relatório deste arquivo",
+        "icon": {
+          "light": "media/download-report.svg",
+          "dark": "media/download-report.svg"
+        }
+      },
+      {
+        "command": "a11y-vsc-assistant.exportAllAccessibilityReports",
+        "title": "A11y: Baixar todos os relatórios do resumo",
         "icon": {
           "light": "media/download-report.svg",
           "dark": "media/download-report.svg"
@@ -62,9 +70,16 @@
     "menus": {
       "view/title": [
         {
-          "command": "a11y-vsc-assistant.exportAccessibilityReport",
+          "command": "a11y-vsc-assistant.exportAllAccessibilityReports",
           "when": "view == a11yErrorSummary",
           "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "a11y-vsc-assistant.exportAccessibilityReportForFile",
+          "when": "view == a11yErrorSummary && viewItem == a11yFile",
+          "group": "inline"
         }
       ]
     }

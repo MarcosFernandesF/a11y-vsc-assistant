@@ -1,5 +1,5 @@
 import type { A11yErrorExportItem, A11yReportPayload } from './exportReport';
-import { getWcagReference } from './rules/wcagReferences';
+import { getWcagReference } from '../rules/core/wcagReferences';
 
 /**
  * Gera o HTML completo do relatorio de acessibilidade.

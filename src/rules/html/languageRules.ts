@@ -1,6 +1,6 @@
-import { RuleError } from "./types";
-import { parseHtmlAttributes } from "./utils/htmlAttributes";
-import { missingPageLanguageMessage } from "./educationMessages";
+import { A11yRule, RuleError } from '../core/types';
+import { parseHtmlAttributes } from '../shared/utils/htmlAttributes';
+import { missingPageLanguageMessage } from '../shared/educationMessages';
 
 // Captura a tag raiz <html ...> para validar o idioma padrão da pagina.
 const HTML_ROOT_TAG_REGEX = /<html\b[^>]*>/i;
@@ -19,16 +19,22 @@ export function validatePageLanguage(text: string): RuleError[] {
 
   const htmlTag = rootMatch[0];
   const attrs = parseHtmlAttributes(htmlTag);
-  const lang = attrs["lang"]?.trim();
+  const lang = attrs['lang']?.trim();
 
   if (!lang) {
     errors.push({
       tag: htmlTag,
       index: rootMatch.index,
       message: missingPageLanguageMessage,
-      wcagReferenceKey: "pageLanguage",
+      wcagReferenceKey: 'pageLanguage',
     });
   }
 
   return errors;
 }
+
+export const pageLanguageRule: A11yRule = {
+  id: 'page-language',
+  languages: ['html'],
+  evaluate: (text) => validatePageLanguage(text),
+};

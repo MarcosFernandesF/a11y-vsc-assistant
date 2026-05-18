@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { validatePageLanguage } from '../../rules/languageRules';
-import { TestCase } from './testTypes';
+import { pageLanguageRule } from '../../rules/html/languageRules';
+import { buildRuleContext, TestCase } from './testTypes';
 
 function runLanguageRuleTests() {
   console.log('Iniciando Testes Unitarios: Regra de Idioma da Pagina Ausente...');
@@ -65,7 +65,7 @@ function runLanguageRuleTests() {
   let passedCount = 0;
 
   testCases.forEach(testCase => {
-    const results = validatePageLanguage(testCase.html);
+    const results = pageLanguageRule.evaluate(testCase.html, buildRuleContext('html'));
     const observed = results.length;
 
     try {

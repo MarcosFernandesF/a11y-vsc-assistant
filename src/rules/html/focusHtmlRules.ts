@@ -1,6 +1,6 @@
-import { RuleError } from "./types";
-import { parseHtmlAttributes } from "./utils/htmlAttributes";
-import { focusVisualRemovalHtmlMessage } from "./educationMessages";
+import { A11yRule, RuleError } from '../core/types';
+import { parseHtmlAttributes } from '../shared/utils/htmlAttributes';
+import { focusVisualRemovalHtmlMessage } from '../shared/educationMessages';
 
 // Captura tags de abertura HTML e o nome da tag no grupo 1.
 const OPENING_TAG_REGEX = /<([a-z][\w:-]*)\b[^>]*>/gi;
@@ -40,9 +40,9 @@ function hasAlternativeFocusIndicator(style: string): boolean {
  * Verifica se um elemento participa da navegacao sequencial por teclado.
  */
 function isSequentiallyFocusable(tagName: string, attrs: Record<string, string>): boolean {
-  const tabindexRaw = attrs["tabindex"];
+  const tabindexRaw = attrs['tabindex'];
 
-  if (typeof tabindexRaw === "string") {
+  if (typeof tabindexRaw === 'string') {
     const parsedTabindex = Number.parseInt(tabindexRaw, 10);
 
     if (!Number.isNaN(parsedTabindex)) {
@@ -52,16 +52,16 @@ function isSequentiallyFocusable(tagName: string, attrs: Record<string, string>)
 
   const normalizedTagName = tagName.toLowerCase();
 
-  if (normalizedTagName === "a") {
-    return typeof attrs["href"] === "string" && attrs["href"].trim() !== "";
+  if (normalizedTagName === 'a') {
+    return typeof attrs['href'] === 'string' && attrs['href'].trim() !== '';
   }
 
-  if (normalizedTagName === "button" || normalizedTagName === "select" || normalizedTagName === "textarea") {
+  if (normalizedTagName === 'button' || normalizedTagName === 'select' || normalizedTagName === 'textarea') {
     return true;
   }
 
-  if (normalizedTagName === "input") {
-    return attrs["type"]?.toLowerCase() !== "hidden";
+  if (normalizedTagName === 'input') {
+    return attrs['type']?.toLowerCase() !== 'hidden';
   }
 
   return false;
@@ -86,7 +86,7 @@ export function validateHtmlFocusVisible(text: string): RuleError[] {
       continue;
     }
 
-    const style = attrs["style"];
+    const style = attrs['style'];
     if (!style) {
       continue;
     }
@@ -103,9 +103,15 @@ export function validateHtmlFocusVisible(text: string): RuleError[] {
       tag: entireTag,
       index: match.index,
       message: focusVisualRemovalHtmlMessage,
-      wcagReferenceKey: "focusVisualRemovalHtml",
+      wcagReferenceKey: 'focusVisualRemovalHtml',
     });
   }
 
   return errors;
 }
+
+export const focusHtmlRule: A11yRule = {
+  id: 'focus-visual-removal-html',
+  languages: ['html'],
+  evaluate: (text) => validateHtmlFocusVisible(text),
+};

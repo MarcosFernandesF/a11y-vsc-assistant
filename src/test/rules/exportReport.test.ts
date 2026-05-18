@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { buildSafeReportFileName, formatA11yReport } from '../../exportReport';
+import { buildSafeReportFileName, formatA11yReport } from '../../reporting/exportReport';
 
 function runExportReportTests() {
   console.log('Iniciando Testes Unitarios: Exportacao de Relatorio...');
@@ -17,7 +17,7 @@ function runExportReportTests() {
         details: 'Dois elementos compartilham o mesmo ID.',
         line: 4,
         column: 5,
-        codeSnippet: '<div id="duplicado"></div>',
+        codeSnippet: '<div id="dup">...</div>',
       },
       {
         category: 'Erros de Conteudo',
@@ -25,7 +25,7 @@ function runExportReportTests() {
         details: 'A imagem deve possuir atributo alt.',
         line: 12,
         column: 3,
-        codeSnippet: '<img src="imagem.png">',
+        codeSnippet: '<img src=\"...\">',
       },
     ],
   });
