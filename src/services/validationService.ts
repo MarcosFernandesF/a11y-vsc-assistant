@@ -51,20 +51,7 @@ export class ValidationService implements vscode.Disposable {
       }
     });
 
-    const activeEditorChangeEvent = vscode.window.onDidChangeActiveTextEditor(editor => {
-      if (!editor) {
-        return;
-      }
-
-      const document = editor.document;
-      if (isSupportedLanguage(document.languageId)) {
-        this.validateDocument(document);
-      } else {
-        this.clearDocument(document);
-      }
-    });
-
-    this.context.subscriptions.push(documentChangeEvent, activeEditorChangeEvent);
+    this.context.subscriptions.push(documentChangeEvent);
   }
 
   validateDocument(document: vscode.TextDocument): void {
