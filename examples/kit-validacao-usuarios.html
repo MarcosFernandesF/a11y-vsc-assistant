@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>A11y Lab | Kit de validação</title>
+  <link rel="stylesheet" href="kit-validacao-usuarios.css" />
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#inicio">
+        <img src="../media/accessibility-icon.svg" alt="Ícone da plataforma A11y Lab" />
+        <span>A11y Lab</span>
+      </a>
+
+      <nav aria-label="Navegação principal">
+        <a href="#sobre">Sobre</a>
+        <a href="#tarefas">Tarefas</a>
+        <a href="#faq">FAQ</a>
+        <a class="nav-cta" href="#contato">Contato</a>
+      </nav>
+    </header>
+
+    <main id="inicio">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Kit de avaliação para o TCC</p>
+          <h1>Uma experiência realista para revisar acessibilidade em HTML e CSS</h1>
+          <p class="lead">Esta base foi pensada para que o participante use a extensão, encontre problemas e aplique
+            correções em um fluxo semelhante ao de um projeto real.</p>
+
+          <div class="hero-actions">
+            <a class="primary-button" href="#tarefas" style="outline: none;">Começar revisão</a>
+            <a class="secondary-link" href="#faq">Ver dúvidas frequentes</a>
+          </div>
+
+          <ul class="hero-stats" aria-label="Resumo do kit">
+            <li>
+              <strong>10</strong>
+              desenvolvedores convidados
+            </li>
+            <li>
+              <strong>HTML + CSS</strong>
+              foco na base de código
+            </li>
+            <li>
+              <strong>SUS</strong>
+              aplicado ao final
+            </li>
+          </ul>
+        </div>
+
+        <figure class="hero-visual">
+          <img src="../media/categories/structure.svg" class="hero-visual__image">
+          <figcaption>Layout de referência com blocos, cards e chamadas para ação.</figcaption>
+        </figure>
+      </section>
+
+      <section id="sobre" class="panel">
+        <div class="section-heading">
+          <p class="section-kicker">Contexto do estudo</p>
+          <h2>Por que este kit existe</h2>
+        </div>
+
+        <p class="intro-copy">O objetivo é avaliar a usabilidade percebida da ferramenta ao apoiar a identificação e
+          correção de problemas de acessibilidade. A página abaixo simula uma interface de produto com navegação,
+          destaques, cards e conteúdo de apoio.</p>
+
+        <div class="insight-grid">
+          <article id="study-card" class="insight-card" onclick="window.location.href='#tarefas'">
+            <img src="../media/categories/content.svg" alt="Ícone de conteúdo">
+            <p class="card-label">Base de trabalho</p>
+            <p class="card-title">HTML com conteúdo editorial e blocos de destaque</p>
+            <p class="card-description">A estrutura mistura leitura, navegação e interação para simular decisões comuns
+              em interfaces reais.</p>
+          </article>
+
+          <article id="study-card" class="insight-card" onclick="window.location.href='#faq'">
+            <img src="../media/categories/focus.svg" alt="Ícone de foco">
+            <p class="card-label">Revisão guiada</p>
+            <p class="card-title">Fluxo para testar leitura, foco e interação por teclado</p>
+            <p class="card-description">Os blocos foram organizados para gerar situações comuns de revisão de
+              acessibilidade em um projeto front-end.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="tarefas" class="panel">
+        <div class="section-heading">
+          <p class="section-kicker">Tarefas</p>
+          <h2>O que o participante deve fazer</h2>
+        </div>
+
+        <ol class="task-list">
+          <li class="task-card">
+            <span class="task-number">01</span>
+            <p class="task-title">Corrigir os pontos sinalizados pela extensão.</p>
+            <p class="task-description">Use a própria interface da ferramenta para conduzir a revisão e, se precisar de
+              uma visão mais completa, confira o relatório exportado.</p>
+          </li>
+
+          <li class="task-card">
+            <span class="task-number">02</span>
+            <p class="task-title">Adicionar uma seção de depoimentos com estrutura mínima.</p>
+            <p class="task-description">Monte o bloco com o mínimo necessário para a ferramenta indicar os ajustes que
+              ainda fizerem falta.</p>
+          </li>
+
+          <li class="task-card">
+            <span class="task-number">03</span>
+            <p class="task-title">Inserir uma FAQ curta com estrutura mínima.</p>
+            <p class="task-description">Deixe a própria revisão apontar o que ainda pode ser ajustado na apresentação do
+              conteúdo.</p>
+          </li>
+
+          <li class="task-card">
+            <span class="task-number">04</span>
+            <p class="task-title">Fazer uma revisão final antes de encerrar.</p>
+            <p class="task-description">Veja se não ficou nenhum item na tela e se a página continua clara em desktop e
+              mobile.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section id="faq" class="panel panel--faq">
+        <div class="section-heading">
+          <p class="section-kicker">Dúvidas comuns</p>
+          <h2>Pontos para orientar a execução</h2>
+        </div>
+
+        <div class="faq-list">
+          <article class="faq-item">
+            <h4>Como devo começar a usar a extensão neste kit?</h4>
+            <p>Abra o arquivo HTML no VS Code, habilite a extensão e siga os avisos apresentados para corrigir o código.
+            </p>
+          </article>
+
+          <article class="faq-item">
+            <h4>Posso reorganizar a estrutura visual da página?</h4>
+            <p>Sim, desde que a adaptação preserve a leitura, a navegação por teclado e a semântica da marcação.</p>
+          </article>
+
+          <article class="faq-item">
+            <h4>O que devo observar ao final da atividade?</h4>
+            <p>Além de corrigir os problemas apontados, observe como a ferramenta ajuda a entender os erros e o que
+              ainda gera dúvida.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="contato" class="panel panel--closing">
+        <div class="closing-box">
+          <p class="section-kicker">Encerramento</p>
+          <p class="closing-title">Finalize a revisão e siga para o questionário</p>
+          <p class="intro-copy">Depois de concluir as tarefas, responda ao questionário do estudo e, em seguida, ao
+            formulário SUS fornecido separadamente.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+
+</html>
