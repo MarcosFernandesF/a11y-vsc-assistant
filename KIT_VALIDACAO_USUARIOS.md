@@ -34,7 +34,7 @@ A ideia não é refazer toda a interface, mas fazer correções pontuais e peque
 ## Roteiro sugerido
 
 1. Leitura do briefing e análise manual da página, da estilização e do código.
-2. Instalação da extensão e comparação dos achados com a lista inicial.
+2. Instalação da extensão via arquivo `.vsix` e comparação dos achados com a lista inicial.
 3. Correção guiada: ir corrigindo os erros com apoio do hover, da barra lateral e do relatório exportado.
 4. Questionário curto ao final.
 5. SUS em formulário separado, reservado para a etapa final do estudo.
@@ -45,15 +45,26 @@ A ideia não é refazer toda a interface, mas fazer correções pontuais e peque
 
 Analise a página, a estilização e o código como um todo, sem ajuda de ferramenta externa. Anote manualmente os problemas de acessibilidade que você perceber com base no seu conhecimento.
 
-### 2. Comparação com a ferramenta
+### 2. Instalação da extensão
 
-Instale a extensão, compare os achados com a sua lista inicial e, se necessário, exporte o relatório para enxergar o panorama geral.
+A extensão será distribuída como arquivo `.vsix` para instalação local no VS Code.
 
-### 3. Correção guiada
+1. Baixe o arquivo `.vsix` disponibilizado para o estudo.
+2. Abra o VS Code e clique no ícone de Extensões na barra lateral.
+3. No painel de Extensões, clique no menu de mais opções.
+4. Selecione a opção para instalar a partir de um arquivo VSIX.
+5. Escolha o arquivo `.vsix` baixado.
+6. Aguarde a instalação terminar e recarregue a janela se o VS Code solicitar.
+
+### 3. Comparação com a ferramenta
+
+Instale a extensão via arquivo `.vsix`, compare os achados com a sua lista inicial e, se necessário, exporte o relatório para enxergar o panorama geral.
+
+### 4. Correção guiada
 
 Vá corrigindo os erros com apoio do feedback exibido no hover, da barra lateral e do relatório exportado para entender melhor cada achado.
 
-### 4. Revisão final
+### 5. Revisão final
 
 Antes de concluir, veja se não ficou nenhum item na tela e se a página continua clara em desktop e mobile.
 
