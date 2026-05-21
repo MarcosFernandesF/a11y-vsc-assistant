@@ -13,13 +13,16 @@ O objetivo é observar como os participantes interagem com a extensão de acessi
 
 ## Contexto da atividade
 
-O kit inclui uma base de interface com aparência próxima de um front real, contendo blocos de conteúdo, cards, chamadas para ação e uma seção de perguntas frequentes.
+O kit inclui uma base de interface com aparência próxima de um front real, contendo blocos de conteúdo, cards, depoimentos e uma seção de perguntas frequentes.
 
 A página foi construída com alguns problemas de acessibilidade propositalmente inseridos para que o participante possa usá-la como cenário de teste da ferramenta.
+Como a ferramenta é um protótipo inicial, o escopo de validação é reduzido; por isso, a leitura manual inicial ajuda a contextualizar os achados antes da comparação com a extensão.
 
 ## Escopo
 
 O estudo foi desenhado para um fluxo curto e objetivo.
+
+Como este é um protótipo inicial, o escopo de validação é reduzido.
 
 A ideia não é refazer toda a interface, mas fazer correções pontuais e pequenas implementações guiadas, usando apenas HTML e CSS.
 
@@ -30,57 +33,63 @@ A ideia não é refazer toda a interface, mas fazer correções pontuais e peque
 
 ## Roteiro sugerido
 
-1. Leitura rápida do briefing e abertura do projeto.
-2. Correção dos pontos sinalizados pela extensão.
-3. Implementações guiadas nas seções da página.
+1. Leitura do briefing e análise manual da página, da estilização e do código.
+2. Instalação da extensão e comparação dos achados com a lista inicial.
+3. Correção guiada: ir corrigindo os erros com apoio do hover, da barra lateral e do relatório exportado.
 4. Questionário curto ao final.
 5. SUS em formulário separado, reservado para a etapa final do estudo.
 
-## Como implementar
+## Etapas da validação
 
-### 1. Guiar a correção com a extensão
+### 1. Análise manual
 
-Comece pelos avisos mais evidentes. Use a barra lateral para acompanhar os achados e, se necessário, exporte um relatório mais detalhado para conferir o panorama geral antes de seguir.
+Analise a página, a estilização e o código como um todo, sem ajuda de ferramenta externa. Anote manualmente os problemas de acessibilidade que você perceber com base no seu conhecimento.
 
-### 2. Criar as novas seções com estrutura mínima
+### 2. Comparação com a ferramenta
 
-Adicione a seção de depoimentos e a FAQ com a menor estrutura útil possível. O participante pode deixar a própria ferramenta indicar os ajustes restantes.
+Instale a extensão, compare os achados com a sua lista inicial e, se necessário, exporte o relatório para enxergar o panorama geral.
 
-### 3. Revisão final
+### 3. Correção guiada
+
+Vá corrigindo os erros com apoio do feedback exibido no hover, da barra lateral e do relatório exportado para entender melhor cada achado.
+
+### 4. Revisão final
 
 Antes de concluir, veja se não ficou nenhum item na tela e se a página continua clara em desktop e mobile.
 
 ## Tarefas
 
-1. Corrigir as violações já existentes no código.
-2. Adicionar uma seção de depoimentos com estrutura mínima.
-3. Inserir uma FAQ curta com estrutura mínima.
+1. Fazer uma leitura manual e anotar os problemas percebidos sem usar a extensão.
+2. Abrir a extensão e comparar os achados com a lista inicial.
+3. Corrigir os pontos encontrados com apoio da barra lateral e do relatório exportado.
+4. Fazer uma revisão final e registrar o que a ferramenta agilizou ou esclareceu.
 
 ## Questionário rápido pós-tarefa
 
 1. Qual é o seu nível de experiência como desenvolvedor(a)?
-	- Iniciante
-	- Intermediário
-	- Avançado
+	- Estagiário
+	- Junior
+	- Pleno
+    - Senior
 2. Qual era o seu contato prévio com acessibilidade web?
 	- Nenhum
 	- Básico
 	- Já usei em projetos
 3. Você já conhecia as regras cobertas pela ferramenta?
-	- Sim, conhecia a maioria.
+	- Não
 	- Sim, conhecia algumas.
+	- Sim, conhecia a maioria.
+4. A ferramenta agilizou o fluxo de correção?
 	- Não
-4. A ferramenta ajudou a identificar os problemas com mais rapidez?
-	- Sim, bastante.
 	- Sim, um pouco.
+	- Sim, bastante.
+5. A ferramenta ajudou a entender os erros de forma didática?
 	- Não
-	- Não percebi diferença.
-5. Você aprendeu algo novo ou achou o material didático?
-	- Sim, aprendi algo novo. Quais?
+	- Sim, um pouco. Quais?
+	- Sim, bastante. Quais?
+6. Tem alguma sugestão de melhoria para a ferramente?
 	- Não
-6. Que melhoria você faria na ferramenta ou neste kit?
-	- Sim, faria uma melhoria. Qual?
-	- Não
+	- Sim. Qual?
 
 ## Observações finais
 

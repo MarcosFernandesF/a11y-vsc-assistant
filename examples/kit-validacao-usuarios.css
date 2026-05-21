@@ -204,6 +204,14 @@ main {
   outline: none;
 }
 
+.primary-button:focus {
+  outline: none;
+}
+
+.nav-cta:focus {
+  outline: none;
+}
+
 .hero-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -247,6 +255,7 @@ main {
   margin-top: 14px;
   color: var(--muted);
   line-height: 1.6;
+  text-align: justify;
 }
 
 .panel {
