@@ -28,8 +28,10 @@ A ideia não é refazer toda a interface, mas fazer correções pontuais e peque
 
 ## Materiais incluídos
 
-- `examples/kit-validacao-usuarios.html`
-- `examples/kit-validacao-usuarios.css`
+- `atividade-validacao.html`
+- `atividade-validacao.css`
+- `instrucoes-kit-validacao.md`
+- `Questionario-SUS.ods`
 
 ## Roteiro sugerido
 
