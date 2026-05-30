@@ -35,19 +35,24 @@ A ideia não é refazer toda a interface, mas fazer correções pontuais e peque
 
 ## Roteiro sugerido
 
-1. Leitura do briefing e análise manual da página, da estilização e do código.
-2. Instalação da extensão via arquivo `.vsix` e comparação dos achados com a lista inicial.
-3. Correção guiada: ir corrigindo os erros com apoio do hover, da barra lateral e do relatório exportado.
-4. Questionário curto ao final.
-5. SUS em formulário separado, reservado para a etapa final do estudo.
+1. Leitura e preenchimento do termo de consentimento livre e esclarecido (TCLE) para participação no estudo.
+2. Leitura do briefing e análise manual da página, da estilização e do código.
+3. Instalação da extensão via arquivo `.vsix` e comparação dos achados com a lista inicial.
+4. Correção guiada: ir corrigindo os erros com apoio do hover, da barra lateral e do relatório exportado.
+5. Questionário curto ao final.
+6. SUS em formulário separado, reservado para a etapa final do estudo.
 
 ## Etapas da validação
 
-### 1. Análise manual
+### 1. Termo de consentimento
+
+Antes de iniciar a atividade, leia e preencha o termo de consentimento livre e esclarecido (TCLE) do estudo. Utilize o Gov para assinar o documento.
+
+### 2. Análise manual
 
 Analise a página, a estilização e o código como um todo, sem ajuda de ferramenta externa. Anote manualmente os problemas de acessibilidade que você perceber com base no seu conhecimento.
 
-### 2. Instalação da extensão
+### 3. Instalação da extensão
 
 A extensão será distribuída como arquivo `.vsix` para instalação local no VS Code.
 
@@ -58,51 +63,52 @@ A extensão será distribuída como arquivo `.vsix` para instalação local no V
 5. Escolha o arquivo `.vsix` baixado.
 6. Aguarde a instalação terminar e recarregue a janela se o VS Code solicitar.
 
-### 3. Comparação com a ferramenta
+### 4. Comparação com a ferramenta
 
 Instale a extensão via arquivo `.vsix`, compare os achados com a sua lista inicial e, se necessário, exporte o relatório para enxergar o panorama geral.
 
-### 4. Correção guiada
+### 5. Correção guiada
 
 Vá corrigindo os erros com apoio do feedback exibido no hover, da barra lateral e do relatório exportado para entender melhor cada achado.
 
-### 5. Revisão final
+### 6. Revisão final
 
 Antes de concluir, veja se não ficou nenhum item na tela e se a página continua clara em desktop e mobile.
 
 ## Tarefas
 
-1. Fazer uma leitura manual e anotar os problemas percebidos sem usar a extensão.
-2. Abrir a extensão e comparar os achados com a lista inicial.
-3. Corrigir os pontos encontrados com apoio da barra lateral e do relatório exportado.
-4. Fazer uma revisão final e registrar o que a ferramenta agilizou ou esclareceu.
+1. Preencher o termo de consentimento livre e esclarecido (TCLE) para participação no estudo.
+2. Fazer uma leitura manual e anotar os problemas percebidos sem usar a extensão.
+3. Abrir a extensão e comparar os achados com a lista inicial.
+4. Corrigir os pontos encontrados com apoio da barra lateral e do relatório exportado.
+5. Fazer uma revisão final e registrar o que a ferramenta agilizou ou esclareceu.
 
 ## Questionário rápido pós-tarefa
 
 1. Qual é o seu nível de experiência como desenvolvedor(a)?
-	- Estagiário
-	- Junior
-	- Pleno
-    - Senior
+   - Estagiário
+   - Junior
+   - Pleno
+   - Senior
 2. Qual era o seu contato prévio com acessibilidade web?
-	- Nenhum
-	- Básico
-	- Já usei em projetos
+   - Nenhum
+   - Básico
+   - Já usei em projetos
 3. Você já conhecia as regras cobertas pela ferramenta?
-	- Não
-	- Sim, conhecia algumas.
-	- Sim, conhecia a maioria.
+   - Não
+   - Sim, conhecia algumas.
+   - Sim, conhecia a maioria.
 4. A ferramenta agilizou o fluxo de correção?
-	- Não
-	- Sim, um pouco.
-	- Sim, bastante.
+   - Não
+   - Sim, um pouco.
+   - Sim, bastante.
 5. A ferramenta ajudou a entender os erros de forma didática?
-	- Não
-	- Sim, um pouco. Quais?
-	- Sim, bastante. Quais?
+   - Não
+   - Sim, um pouco. Quais?
+   - Sim, bastante. Quais?
 6. Tem alguma sugestão de melhoria para a ferramente?
-	- Não
-	- Sim. Qual?
+   - Não
+   - Sim. Qual?
 
 ## Observações finais
 
