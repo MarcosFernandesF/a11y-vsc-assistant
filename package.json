@@ -2,7 +2,8 @@
   "name": "a11y-vsc-assistant",
   "displayName": "A11y VSCode Assistant",
   "description": "Assistente proativo de acessibilidade web para análise em tempo real de diretrizes WCAG 2.2 em arquivos HTML e CSS",
-  "version": "0.0.1",
+  "version": "0.0.3",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/MarcosFernandesF/a11y-vsc-assistant.git"
